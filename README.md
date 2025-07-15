@@ -1,15 +1,27 @@
-## 概述
-初始化安装包:
-pip install pandas scikit-learn tensorflow fastapi uvicorn holidays
+# 负荷预测服务 README
 
-api.py 调用预测接口
-train_final.py 最终训练模型代码
-output/finetune_model.py 增量微调训练模型
+## 概述  
+本项目用于对站点未来 24h（96 点）负荷进行预测，并支持增量微调。  
 
-load.csv 初始训练数据
-out/incremental_data.csv 增量训练数据
+## 1. 安装依赖
+```bash pip install pandas scikit-learn tensorflow fastapi uvicorn holidays
 
-## api传参接口说明
+## 2. 目录结构
+.
+├── api.py                 # FastAPI 预测接口
+├── train_final.py         # 全量训练脚本
+├── output/
+│   └── finetune_model.py  # 增量微调脚本
+├── load.csv               # 初始训练数据
+└── out/
+    └── incremental_data.csv  # 增量训练数据
+
+## API 接口文档
+1. 请求地址
+POST /predict
+2. 请求头
+Content-Type: application/json
+3. 请求体示例
 {
   "station_ref_id": "STATION_001",
   "historical_data": [
@@ -23,8 +35,8 @@ out/incremental_data.csv 增量训练数据
       "cloud": 20,
       "is_work": 1,
       "is_peak": 1
-    },
-    // ... 此处应有前五天的【历史】数据点...
+    }
+    /* 需补充前 5 天历史数据，共 5×96=480 条 */
   ],
   "future_data": [
     {
@@ -46,7 +58,33 @@ out/incremental_data.csv 增量训练数据
       "cloud": 15,
       "is_work": 1,
       "is_peak": 1
+    }
+    /* 需补充未来 1 天数据，共 96 条 */
+  ]
+}
+| 字段名                    | 类型     | 说明                 |
+| ---------------------- | ------ | ------------------ |
+| station\_ref\_id       | string | 站点唯一标识             |
+| historical\_data       | array  | 过去 5 天历史数据（480 条）  |
+| future\_data           | array  | 预测日未来 24h 数据（96 条） |
+| energy\_date           | string | ISO-8601 时间戳（UTC）  |
+| load\_discharge\_delta | float  | 负荷-放电差值，仅历史数据有     |
+| temp                   | float  | 温度（°C）             |
+| code                   | int    | 天气编码               |
+| humidity               | float  | 湿度（%）              |
+| windSpeed              | float  | 风速（m/s）            |
+| cloud                  | int    | 云量（%）              |
+| is\_work               | int    | 是否工作日（0/1）         |
+| is\_peak               | int    | 是否峰时段（0/1）         |
+
+3.返回示例:
+{
+  "station_ref_id": "STATION_001",
+  "predictions": [
+    {
+      "energy_date": "2025-07-15T00:00:00Z",
+      "load": 150.2
     },
-    // ... 此处应有 未来一天的96 个更多【未来】数据点, 每个都包含 is_work 和 is_peak ...
+    ...
   ]
 }
