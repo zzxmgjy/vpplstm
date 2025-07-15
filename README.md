@@ -1,6 +1,13 @@
 ## 概述
 初始化安装包:
-!pip install pandas scikit-learn tensorflow fastapi uvicorn holidays
+pip install pandas scikit-learn tensorflow fastapi uvicorn holidays
+
+api.py 调用预测接口
+train_final.py 最终训练模型代码
+output/finetune_model.py 增量微调训练模型
+
+load.csv 初始训练数据
+out/incremental_data.csv 增量训练数据
 
 ## api传参接口说明
 {
