@@ -22,7 +22,7 @@ CFG = dict(
     batch_size   = 256,      # 优化batch_size
     epochs       = 150,      # 适度训练轮次
     patience     = 15,
-    lr           = 1e-3     # 稍高学习率
+    lr           = 5e-4     # 稍高学习率
 )
 
 # === 1. 读数 ===
