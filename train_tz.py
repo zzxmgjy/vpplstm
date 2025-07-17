@@ -230,7 +230,7 @@ print('\nSaving model and scalers...')
 model.save('output/model_optimized.h5')
 joblib.dump(scaler_x_fitted, 'output/scaler_x_optimized.pkl')
 joblib.dump(scaler_y_fitted, 'output/scaler_y_optimized.pkl')
-joblib.dump(le, 'output/label_encoder.pkl')
+joblib.dump(le, 'output/label_encoder_optimized.pkl')
 print('All assets saved to output/')
 
 # 可视化训练过程
