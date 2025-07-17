@@ -4,7 +4,8 @@
 本项目用于对站点未来 24h（96 点）负荷进行预测，并支持增量微调。  
 
 ## 1. 安装依赖
-```bash pip install pandas scikit-learn tensorflow fastapi uvicorn holidays
+```bash 
+pip install pandas scikit-learn tensorflow fastapi uvicorn holidays matplotlib
 
 ## 2. 目录结构
 .
