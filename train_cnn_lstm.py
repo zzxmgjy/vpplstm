@@ -1,318 +1,276 @@
 # ============================================================================
-# 0. 依赖 & 环境
+# 0. 依赖
 # ============================================================================
-import os, joblib, warnings, sys
-import pandas as pd
+import os, sys, warnings, joblib
 import numpy as np
+import pandas as pd
 import holidays
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.metrics import mean_absolute_percentage_error, mean_squared_error
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import (Conv1D, MaxPooling1D,
-                                     LSTM, Dense, Dropout)
-from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+                                     LSTM, Dropout, Dense)
+from tensorflow.keras.callbacks import (EarlyStopping,
+                                        ReduceLROnPlateau,
+                                        TerminateOnNaN)
 import matplotlib.pyplot as plt
 
-warnings.filterwarnings("ignore")
+warnings.filterwarnings('ignore')
+pd.options.mode.chained_assignment = None
 os.makedirs('output_cnn_lstm', exist_ok=True)
 
 # ============================================================================
-# 1. 超参数配置
+# 1. 超参
 # ============================================================================
 CFG = dict(
-    # --- 序列步长 ---
-    past_steps   = 96 * 5,    # 过去 5 天 (15min 采样 -> 96 点/天)
-    future_steps = 96,        # 未来 1 天
-    # --- CNN ---
-    conv_filters = [32, 64],
-    kernel_size  = 3,
-    pool_size    = 2,
-    # --- LSTM ---
-    lstm_units   = [256, 128],
-    drop_rate    = 0.4,
-    # --- 训练 ---
-    batch_size   = 256,
-    epochs       = 150,
-    patience     = 15,
-    lr           = 8e-4,
-    # --- 其他 ---
-    seed         = 42
+    freq          = '15T',          # 统一 15 min 频率
+    jump_sigma    = 4,              # diff>4σ 视为跳变
+    clip_sigma    = 3,              # 3σ 裁剪
+    split_ratio   = (0.7, .15, .15),# Train/Val/Test
+    past_steps    = 96*5,           # 5 天
+    future_steps  = 96,             # 1 天
+    conv_filters  = [64,128],
+    kernel_size   = 3,
+    pool_size     = 2,
+    lstm_units    = [256,128],
+    drop_rate     = .4,
+    epochs        = 200,
+    batch_size    = 256,
+    patience      = 15,
+    lr            = 1e-4,           # ↓ 初始 LR 更小
+    seed          = 42
 )
-
 np.random.seed(CFG['seed'])
 tf.random.set_seed(CFG['seed'])
+tf.debugging.enable_check_numerics()   # 数值监测
 
 # ============================================================================
-# 2. 读数
+# 2. 读取原始数据
 # ============================================================================
-csv_file = 'loaddata.csv'
-if not os.path.exists(csv_file):
-    sys.exit(f'未找到 {csv_file}，请将数据文件放在脚本同目录下！')
+SRC = 'loaddata.csv'
+if not os.path.exists(SRC):
+    sys.exit(f'❌ 未找到 {SRC} ，请将数据文件放在脚本目录下')
 
-df = pd.read_csv(csv_file, parse_dates=['energy_date'])
-df = df.sort_values(['station_ref_id', 'energy_date'])
+raw = pd.read_csv(SRC, parse_dates=['energy_date'])
+raw = raw.sort_values(['station_ref_id', 'energy_date'])
 
 # ============================================================================
-# 3. 特征工程
+# 3. 自动清洗
+# ============================================================================
+def clean_one_station(df_sta: pd.DataFrame, sid) -> pd.DataFrame:
+    log = {}
+    df_sta = df_sta.sort_values('energy_date').drop_duplicates('energy_date')
+    full_idx = pd.date_range(df_sta['energy_date'].min(),
+                             df_sta['energy_date'].max(),
+                             freq=CFG['freq'])
+    df_sta = df_sta.set_index('energy_date').reindex(full_idx)
+    df_sta.index.name = 'energy_date'
+    df_sta['station_ref_id'] = sid
+    log['补行'] = int(df_sta['load_discharge_delta'].isna().sum())
+
+    # 零/负→NaN
+    mask0 = df_sta['load_discharge_delta']<=0
+    log['<=0→NaN'] = int(mask0.sum())
+    df_sta.loc[mask0,'load_discharge_delta'] = np.nan
+
+    # 3σ clip
+    m, s = df_sta['load_discharge_delta'].mean(), df_sta['load_discharge_delta'].std()
+    if s>0:
+        low, high = m-CFG['clip_sigma']*s, m+CFG['clip_sigma']*s
+        clip_m = (df_sta['load_discharge_delta']<low)|(df_sta['load_discharge_delta']>high)
+        log['3σ裁剪'] = int(clip_m.sum())
+        df_sta['load_discharge_delta'] = df_sta['load_discharge_delta'].clip(low, high)
+
+    # 跳变→NaN
+    diff = df_sta['load_discharge_delta'].diff().abs()
+    jump_m = diff > CFG['jump_sigma']*s
+    log['跳变→NaN'] = int(jump_m.sum())
+    df_sta.loc[jump_m,'load_discharge_delta']=np.nan
+
+    # 连续缺失插值
+    miss_b = int(df_sta['load_discharge_delta'].isna().sum())
+    df_sta['load_discharge_delta'] = df_sta['load_discharge_delta']\
+        .interpolate('time', limit_direction='both')
+    miss_a = int(df_sta['load_discharge_delta'].isna().sum())
+    log['缺失前/后'] = f'{miss_b}/{miss_a}'
+
+    print('🧹', sid, ' | '.join([f'{k}:{v}' for k,v in log.items()]))
+    return df_sta.reset_index()
+
+def clean_all(df):
+    return pd.concat([clean_one_station(g, sid) for sid, g in df.groupby('station_ref_id')],
+                     ignore_index=True)
+
+print('\n=== 开始数据清洗 ===')
+df_clean = clean_all(raw)
+
+# ============================================================================
+# 4. 时间切分
+# ============================================================================
+t0, t1 = df_clean['energy_date'].min(), df_clean['energy_date'].max()
+span   = (t1 - t0).total_seconds()
+r_tr, r_v, _ = np.cumsum(CFG['split_ratio'])
+t_tr_end = t0 + pd.Timedelta(seconds=span*r_tr)
+t_v_end  = t0 + pd.Timedelta(seconds=span*r_v)
+
+df_clean['set'] = 'test'
+df_clean.loc[df_clean['energy_date']<=t_tr_end, 'set'] = 'train'
+df_clean.loc[(df_clean['energy_date']>t_tr_end)&(df_clean['energy_date']<=t_v_end),
+             'set'] = 'val'
+print('\n=== 切分完成 ===')
+print(df_clean['set'].value_counts())
+
+# ============================================================================
+# 5. 特征工程
 # ============================================================================
 cn_holidays = holidays.country_holidays('CN')
-
-def add_time_feat(_df: pd.DataFrame) -> pd.DataFrame:
-    df_ = _df.copy()
-    # 基础时间特征
-    df_['hour']    = df_['energy_date'].dt.hour
-    df_['weekday'] = df_['energy_date'].dt.weekday
-    df_['day']     = df_['energy_date'].dt.day
-    df_['month']   = df_['energy_date'].dt.month
-
-    # 处理目标列
-    df_['load_discharge_delta'] = pd.to_numeric(df_['load_discharge_delta'],
-                                                errors='coerce')
-    df_['load_discharge_delta'] = df_.groupby('station_ref_id')[
-        'load_discharge_delta'].ffill()
-
-    # 滞后特征
-    lags = [1, 4, 24, 96]
-    for lag in lags:
-        df_[f'load_lag{lag}'] = df_.groupby('station_ref_id')[
-            'load_discharge_delta'].shift(lag)
-
-    # 移动统计
-    windows = [4, 24, 96]
-    for win in windows:
-        grp = df_.groupby('station_ref_id')['load_discharge_delta']
-        df_[f'load_ma{win}']  = grp.rolling(win, 1).mean().reset_index(
-            level=0, drop=True)
-        df_[f'load_std{win}'] = grp.rolling(win, 1).std().reset_index(
-            level=0, drop=True)
-
-    # 节假日
-    df_['is_holiday'] = df_['energy_date'].isin(cn_holidays).astype(int)
-
-    # 周期 sin / cos
-    df_['sin_hour'] = np.sin(2*np.pi*df_['hour']/24)
-    df_['cos_hour'] = np.cos(2*np.pi*df_['hour']/24)
-    df_['sin_wday'] = np.sin(2*np.pi*df_['weekday']/7)
-    df_['cos_wday'] = np.cos(2*np.pi*df_['weekday']/7)
-
-    # 温度二次项
-    df_['temp_squared'] = df_['temp'] ** 2
-
-    return df_
-
-df = add_time_feat(df)
+def add_time_feat(df):
+    df = df.copy()
+    df['hour']    = df['energy_date'].dt.hour
+    df['weekday'] = df['energy_date'].dt.weekday
+    df['sin_hour'] = np.sin(2*np.pi*df['hour']/24)
+    df['cos_hour'] = np.cos(2*np.pi*df['hour']/24)
+    df['sin_wday'] = np.sin(2*np.pi*df['weekday']/7)
+    df['cos_wday'] = np.cos(2*np.pi*df['weekday']/7)
+    df['temp_squared'] = df['temp']**2
+    df['is_holiday']   = df['energy_date'].isin(cn_holidays).astype(int)
+    for lag in [1,4,24,96]:
+        df[f'load_lag{lag}'] = df.groupby('station_ref_id')['load_discharge_delta'].shift(lag)
+    for win in [4,24,96]:
+        grp = df.groupby('station_ref_id')['load_discharge_delta']
+        df[f'load_ma{win}']  = grp.rolling(win,1).mean().reset_index(level=0,drop=True)
+        df[f'load_std{win}'] = grp.rolling(win,1).std().reset_index(level=0,drop=True)
+    return df
+df_feat = add_time_feat(df_clean)
 
 # ============================================================================
-# 4. 清洗 & NaN 处理
-# ============================================================================
-df = df.set_index('energy_date')
-
-# 仅对目标列做 3σ 裁剪
-for sid in df['station_ref_id'].unique():
-    mask = df['station_ref_id'] == sid
-    col_data = df.loc[mask, 'load_discharge_delta']
-    mean, std = col_data.mean(), col_data.std()
-    if std > 0:
-        low, high = mean - 3*std, mean + 3*std
-        df.loc[mask, 'load_discharge_delta'] = col_data.clip(low, high)
-
-df = df.fillna(method='ffill').dropna()
-df = df.reset_index()
-
-# ============================================================================
-# 5. LabelEncoder
+# 6. 编码
 # ============================================================================
 le = LabelEncoder()
-df['station_enc'] = le.fit_transform(df['station_ref_id'])
+df_feat['station_enc'] = le.fit_transform(df_feat['station_ref_id'])
 
 # ============================================================================
-# 6. 滑窗样本制作
+# 7. 滑窗制作 (强化版)
 # ============================================================================
-feature_cols = [
-    'temp', 'temp_squared', 'humidity', 'windSpeed',
-    'load_lag1', 'load_lag4', 'load_lag24', 'load_lag96',
-    'load_ma4', 'load_ma24', 'load_ma96',
-    'load_std4', 'load_std24', 'load_std96',
-    'is_holiday', 'sin_hour', 'cos_hour', 'sin_wday', 'cos_wday',
-    'station_enc'
-]
+feature_cols = ['temp','temp_squared','humidity','windSpeed',
+                'load_lag1','load_lag4','load_lag24','load_lag96',
+                'load_ma4','load_ma24','load_ma96',
+                'load_std4','load_std24','load_std96',
+                'is_holiday','sin_hour','cos_hour','sin_wday','cos_wday',
+                'station_enc']
 target_col = 'load_discharge_delta'
 
-def make_dataset(data: pd.DataFrame,
-                 past_steps: int,
-                 future_steps: int):
-    data = data.sort_values(['station_enc', 'energy_date'])\
-               .set_index('energy_date')
+def make_dataset(data_set, past_steps, fut_steps, df_src):
+    sub = df_src[df_src['set'].isin(data_set)].copy().sort_values(['station_enc','energy_date'])
+    sub[feature_cols + [target_col]] = sub[feature_cols + [target_col]].astype(float)
 
-    # 标准化器
+    # 插值 & 填 0
+    sub[feature_cols + [target_col]] = sub.groupby('station_enc')[feature_cols + [target_col]]\
+        .apply(lambda g: g.set_index(sub.loc[g.index,'energy_date'])
+                          .interpolate('time', limit_direction='both'))\
+        .reset_index(drop=True)
+    sub[feature_cols + [target_col]] = sub[feature_cols + [target_col]].fillna(0)
+
     scaler_x, scaler_y = StandardScaler(), StandardScaler()
+    X_scaled = scaler_x.fit_transform(sub[feature_cols])
+    y_scaled = scaler_y.fit_transform(sub[[target_col]])
 
-    # 保证全为数值
-    for col in feature_cols + [target_col]:
-        data[col] = pd.to_numeric(data[col], errors='coerce')
-    data = data.fillna(method='ffill').dropna()
-    if data.empty:
-        return np.array([]), np.array([]), None, None
-
-    X_scaled = scaler_x.fit_transform(data[feature_cols])
-    y_scaled = scaler_y.fit_transform(data[[target_col]])
-
-    scaled_df = pd.DataFrame(X_scaled,
-                             columns=feature_cols,
-                             index=data.index)
-    scaled_df[target_col] = y_scaled
-    scaled_df['station_enc'] = data['station_enc'].values  # 保留编码列
+    sub_scaled = pd.DataFrame(X_scaled, columns=feature_cols, index=sub.index)
+    sub_scaled[target_col]   = y_scaled
+    sub_scaled['station_enc'] = sub['station_enc'].values
+    sub_scaled['energy_date'] = sub['energy_date'].values
 
     Xs, ys = [], []
-    for sid in scaled_df['station_enc'].unique():
-        sub_df = scaled_df[scaled_df['station_enc'] == sid]
-        if len(sub_df) < past_steps + future_steps:
-            continue
-        X_arr = sub_df[feature_cols].values
-        y_arr = sub_df[[target_col]].values
-        for i in range(len(sub_df) - past_steps - future_steps + 1):
-            Xs.append(X_arr[i:i+past_steps])
-            ys.append(y_arr[i+past_steps:i+past_steps+future_steps, 0])
+    for sid in sub_scaled['station_enc'].unique():
+        d = sub_scaled[sub_scaled['station_enc']==sid]
+        if len(d) < past_steps + fut_steps: continue
+        xf, yf = d[feature_cols].values, d[[target_col]].values
+        for i in range(len(d)-past_steps-fut_steps+1):
+            Xs.append(xf[i:i+past_steps])
+            ys.append(yf[i+past_steps:i+past_steps+fut_steps,0])
+    Xs, ys = np.array(Xs), np.array(ys)
 
-    return np.array(Xs), np.array(ys), scaler_x, scaler_y
+    # 滑窗后过滤 NaN / Inf
+    ok = np.isfinite(Xs).all((1,2)) & np.isfinite(ys).all(1)
+    if ok.sum() < len(ok):
+        print(f'[NanFilter] {data_set} remove {len(ok)-ok.sum()} bad samples')
+    Xs, ys = Xs[ok], ys[ok]
+    if len(Xs)==0:
+        raise ValueError(f'{data_set} 没有有效样本！')
+    return Xs, ys, scaler_x, scaler_y
 
-print('=== 构造滑窗样本 ===')
-X, y, scaler_x, scaler_y = make_dataset(df,
-                                        CFG['past_steps'],
-                                        CFG['future_steps'])
-if len(X) == 0:
-    sys.exit("滑窗样本为空，请检查数据量或参数！")
+print('\n=== 制作样本 ===')
+X_train, y_train, scaler_x, scaler_y = make_dataset({'train'},
+                        CFG['past_steps'], CFG['future_steps'], df_feat)
+X_val, y_val, _, _ = make_dataset({'val'}, CFG['past_steps'], CFG['future_steps'], df_feat)
+X_test, y_test, _, _ = make_dataset({'test'}, CFG['past_steps'], CFG['future_steps'], df_feat)
+print(f'Train:{X_train.shape}  Val:{X_val.shape}  Test:{X_test.shape}')
 
-# 划分训练 / 验证
-split = int(0.8 * len(X))
-X_train, X_val = X[:split], X[split:]
-y_train, y_val = y[:split], y[split:]
-
-print(f'Train shape: {X_train.shape},  Val shape: {X_val.shape}')
+# 二次断言
+def chk(name, arr):
+    assert np.isfinite(arr).all(), f'{name} still has NaN / Inf!'
+chk('X_train', X_train); chk('y_train', y_train)
 
 # ============================================================================
-# 7. CNN-LSTM 模型
+# 8. CNN-LSTM
 # ============================================================================
 model = Sequential([
-    # CNN ①
-    Conv1D(filters=CFG['conv_filters'][0],
-           kernel_size=CFG['kernel_size'],
-           activation='relu',
-           padding='same',
-           input_shape=(X.shape[1], X.shape[2])),
-    MaxPooling1D(pool_size=CFG['pool_size']),
-    Dropout(CFG['drop_rate']),
-    # CNN ②
-    Conv1D(filters=CFG['conv_filters'][1],
-           kernel_size=CFG['kernel_size'],
-           activation='relu',
-           padding='same'),
-    MaxPooling1D(pool_size=CFG['pool_size']),
-    Dropout(CFG['drop_rate']),
-    # LSTM 堆叠
+    Conv1D(CFG['conv_filters'][0], CFG['kernel_size'],
+           activation='relu', padding='same',
+           input_shape=(X_train.shape[1], X_train.shape[2])),
+    MaxPooling1D(CFG['pool_size']), Dropout(CFG['drop_rate']),
+    Conv1D(CFG['conv_filters'][1], CFG['kernel_size'],
+           activation='relu', padding='same'),
+    MaxPooling1D(CFG['pool_size']), Dropout(CFG['drop_rate']),
     LSTM(CFG['lstm_units'][0], return_sequences=True),
     Dropout(CFG['drop_rate']),
-    LSTM(CFG['lstm_units'][1]),
-    Dropout(CFG['drop_rate']),
-    # Dense 输出未来 96 步
+    LSTM(CFG['lstm_units'][1]), Dropout(CFG['drop_rate']),
     Dense(CFG['future_steps'])
 ])
-
-model.compile(optimizer=tf.keras.optimizers.Adam(CFG['lr']),
-              loss='mae')
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(CFG['lr'], clipnorm=1.0),
+    loss=tf.keras.losses.Huber(delta=1.0)    # 比 MAE/MSE 更稳
+)
 model.summary()
 
-# ============================================================================
-# 8. 训练
-# ============================================================================
-callbacks = [
-    EarlyStopping(monitor='val_loss',
-                  patience=CFG['patience'],
-                  restore_best_weights=True),
-    ReduceLROnPlateau(monitor='val_loss',
-                      factor=0.5,
-                      patience=5,
-                      min_lr=1e-5)
+cb = [
+    TerminateOnNaN(),                                  # ← 一旦 nan 立即停
+    EarlyStopping('val_loss', patience=CFG['patience'], restore_best_weights=True),
+    ReduceLROnPlateau('val_loss', factor=.5, patience=5, min_lr=1e-5)
 ]
-history = model.fit(
-    X_train, y_train,
-    validation_data=(X_val, y_val),
-    epochs=CFG['epochs'],
-    batch_size=CFG['batch_size'],
-    callbacks=callbacks,
-    verbose=1
-)
+history = model.fit(X_train, y_train,
+                    validation_data=(X_val, y_val),
+                    epochs=CFG['epochs'],
+                    batch_size=CFG['batch_size'],
+                    callbacks=cb,
+                    verbose=1)
 
 # ============================================================================
-# 9. 逐站点评估 & 可视化
+# 9. 测试评估
 # ============================================================================
-all_preds, all_trues = [], []
-for sid, g in df.groupby('station_ref_id'):
-    if len(g) < CFG['past_steps'] + CFG['future_steps']:
-        print(f'[Skip] {sid} 数据不足')
-        continue
+pred_scaled = model.predict(X_test, verbose=0)
+pred = scaler_y.inverse_transform(pred_scaled.reshape(-1,1)).flatten()
+true = scaler_y.inverse_transform(y_test.reshape(-1,1)).flatten()
+finite = np.isfinite(pred) & np.isfinite(true)
+pred, true = pred[finite], true[finite]
 
-    test_block = g.tail(CFG['past_steps'] + CFG['future_steps'])
-    X_test_scaled = scaler_x.transform(test_block[feature_cols])
-    X_test = X_test_scaled[:-CFG['future_steps']]\
-             .reshape(1, CFG['past_steps'], -1)
-
-    pred_scaled = model.predict(X_test, verbose=0)[0]
-    pred = scaler_y.inverse_transform(pred_scaled.reshape(-1,1)).flatten()
-    true = test_block.tail(CFG['future_steps'])[target_col].values
-
-    # 保存整体数组
-    all_preds.append(pred)
-    all_trues.append(true)
-
-    # 指标
-    true_safe = np.where(true == 0, 1e-6, true)
-    mape = mean_absolute_percentage_error(true_safe, pred) * 100
-    rmse = np.sqrt(mean_squared_error(true, pred))
-    print(f'{sid}  |  MAPE={mape:.2f}%  RMSE={rmse:.2f}')
-
-    # 绘图
-    idx = test_block['energy_date'].iloc[-CFG['future_steps']:].reset_index(drop=True)
-    plt.figure(figsize=(15,4))
-    plt.plot(idx, true, label='Real', marker='.')
-    plt.plot(idx, pred, label='Pred', marker='.')
-    plt.title(f'{sid}  |  MAPE={mape:.2f}%  RMSE={rmse:.2f}')
-    plt.legend(); plt.grid(True, linestyle='--', linewidth=.5)
-    plt.ylabel('Load Discharge Delta'); plt.xlabel('DateTime')
-    plt.tight_layout()
-    plt.savefig(f'output/pred_{sid}.png')
-    plt.close()
-
-# 总体指标
-if all_trues:
-    overall_mape = mean_absolute_percentage_error(
-        np.concatenate(all_trues),
-        np.concatenate(all_preds)) * 100
-    overall_rmse = np.sqrt(mean_squared_error(
-        np.concatenate(all_trues),
-        np.concatenate(all_preds)))
-    print('\n=== Overall ===')
-    print(f'MAPE : {overall_mape:.2f}%')
-    print(f'RMSE : {overall_rmse:.2f}')
+mape = mean_absolute_percentage_error(np.where(true==0,1e-6,true), pred)*100
+rmse = np.sqrt(mean_squared_error(true, pred))
+print(f'\n=== Test Set ===  MAPE:{mape:.2f}%  RMSE:{rmse:.2f}')
 
 # ============================================================================
-# 10. 资产保存
+# 10. 保存
 # ============================================================================
-print('\nSaving model & scalers...')
-model.save('output/model_cnn_lstm_cnn.h5')
-joblib.dump(scaler_x, 'output/scaler_x_cnn.pkl')
-joblib.dump(scaler_y, 'output/scaler_y_cnn.pkl')
-joblib.dump(le,        'output/label_encoder_cnn.pkl')
+model.save('output_cnn_lstm/model_cnn_lstm.h5')
+joblib.dump(scaler_x, 'output_cnn_lstm/scaler_x.pkl')
+joblib.dump(scaler_y, 'output_cnn_lstm/scaler_y.pkl')
+joblib.dump(le,        'output_cnn_lstm/label_encoder.pkl')
+print('✅ 模型与Scaler已保存至 output_cnn_lstm/')
 
-# 训练曲线
 plt.figure(figsize=(8,4))
 plt.plot(history.history['loss'], label='Train')
 plt.plot(history.history['val_loss'], label='Val')
-plt.title('Training History')
-plt.ylabel('MAE'); plt.xlabel('Epoch')
-plt.legend(); plt.tight_layout()
-plt.savefig('output/training_history_cnn.png')
-plt.close()
-
-print('全部完成！查看 output 文件夹获取模型与图表。')
+plt.legend(); plt.title('Training History'); plt.tight_layout()
+plt.savefig('output_cnn_lstm/training_history.png'); plt.close()
+print('🎉 全流程结束，详见 output_cnn_lstm/ 目录')
