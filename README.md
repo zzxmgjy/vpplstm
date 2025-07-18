@@ -6,11 +6,12 @@
 ## 1. 安装依赖
 ```bash 
 gpu服务器安装
-pip install pandas scikit-learn fastapi uvicorn holidays matplotlib
-# 清理 pip 缓存
-pip cache purge
-# 使用 --verbose (-v) 模式重新安装
-pip install -v tensorflow[and-cuda]
+pip install pandas scikit-learn fastapi uvicorn holidays matplotlib 
+
+#确定cuda版本然后安装pytorch
+nvidia-smi
+#去官网找，然后安装
+https://pytorch.org/get-started/previous-versions/
 
 
 pip install pandas scikit-learn tensorflow fastapi uvicorn holidays matplotlib
