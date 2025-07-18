@@ -19,12 +19,12 @@ os.makedirs('output_pytorch', exist_ok=True) # 使用新的输出文件夹
 CFG = dict(
     past_steps    = 96 * 5,
     future_steps  = 96,
-    hidden_dims   = [256, 128], # PyTorch LSTM 的隐藏层维度
-    drop_rate     = 0.4,
+    hidden_dims   = [128, 128], # PyTorch LSTM 的隐藏层维度
+    drop_rate     = 0.2401,
     batch_size    = 256,
     epochs        = 150,
     patience      = 15,
-    lr            = 5e-4
+    lr            = 2.16485e-4
 )
 
 # === 1. 读数 (保持不变) ===
@@ -154,7 +154,7 @@ print(f"将使用设备: {device}")
 model = LSTMModel(len(feature_cols), CFG['hidden_dims'], CFG['future_steps'], CFG['drop_rate']).to(device)
 criterion = nn.L1Loss() # MAE Loss
 optimizer = torch.optim.Adam(model.parameters(), lr=CFG['lr'])
-scheduler = ReduceLROnPlateau(optimizer, 'min', patience=5, factor=0.5, verbose=True)
+scheduler = ReduceLROnPlateau(optimizer, 'min', patience=5, factor=0.5)
 
 best_val_loss = float('inf')
 patience_counter = 0
