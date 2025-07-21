@@ -14,18 +14,6 @@ nvidia-smi
 https://pytorch.org/get-started/previous-versions/
 
 
-pip install pandas scikit-learn tensorflow fastapi uvicorn holidays matplotlib
-
-
-## 2. 目录结构
-.
-├── api.py                 # FastAPI 预测接口
-├── train_final.py         # 全量训练脚本
-├── output/
-│   └── finetune_model.py  # 增量微调脚本
-├── load.csv               # 初始训练数据
-└── out/
-    └── incremental_data.csv  # 增量训练数据
 
 ## API 接口文档
 1. 请求地址
@@ -34,68 +22,74 @@ POST /predict
 Content-Type: application/json
 3. 请求体示例
 {
-  "station_ref_id": "STATION_001",
-  "historical_data": [
+  "station_id": "9001",          // string/int 均可
+  "past_data": [                 // 连续 480 条历史 15min 样本（5 天）
     {
-      "energy_date": "2025-07-10T08:00:00Z",
-      "load_discharge_delta": 180.5,
-      "temp": 28.2,
-      "code": 100,
-      "humidity": 55.1,
-      "windSpeed": 11.3,
-      "cloud": 20,
-      "is_work": 1,
-      "is_peak": 1
-    }
-    /* 需补充前 5 天历史数据，共 5×96=480 条 */
-  ],
-  "future_data": [
-    {
-      "energy_date": "2025-07-15T00:00:00Z",
-      "temp": 22.5,
-      "code": 101,
-      "humidity": 66,
-      "windSpeed": 7.9,
-      "cloud": 32,
-      "is_work": 1,
-      "is_peak": 0
+      "energy_date": "2023-08-01T00:00:00",
+      "load_discharge_delta": 123.4,
+      "temp": 29.6,
+      "humidity": 65.2,
+      "windSpeed": 2.8,
+      "is_work": 1,              // 可省略，服务器自动推导
+      "is_peak": 0               // 可省略
     },
+    …
     {
-      "energy_date": "2025-07-15T09:00:00Z",
-      "temp": 26.8,
-      "code": 100,
-      "humidity": 60,
-      "windSpeed": 8.5,
-      "cloud": 15,
-      "is_work": 1,
-      "is_peak": 1
+      "energy_date": "2023-08-05T23:45:00",
+      "load_discharge_delta": 141.2,
+      "temp": 28.0,
+      "humidity": 70.1,
+      "windSpeed": 1.9
     }
-    /* 需补充未来 1 天数据，共 96 条 */
+  ],
+
+  "future_external": [           // 连续 672 条未来 15min 外生特征（7 天）
+    {
+      "energy_date": "2023-08-06T00:00:00",
+      "temp": 28.5,
+      "humidity": 71.0,
+      "windSpeed": 2.1,
+      "is_work": 0,              // 可省略
+      "is_peak": 0               // 可省略
+    },
+    …
+    {
+      "energy_date": "2023-08-12T23:45:00",
+      "temp": 30.1,
+      "humidity": 68.7,
+      "windSpeed": 3.0
+    }
   ]
 }
-| 字段名                    | 类型     | 说明                 |
-| ---------------------- | ------ | ------------------ |
-| station\_ref\_id       | string | 站点唯一标识             |
-| historical\_data       | array  | 过去 5 天历史数据（480 条）  |
-| future\_data           | array  | 预测日未来 24h 数据（96 条） |
-| energy\_date           | string | ISO-8601 时间戳（UTC）  |
-| load\_discharge\_delta | float  | 负荷-放电差值，仅历史数据有     |
-| temp                   | float  | 温度（°C）             |
-| code                   | int    | 天气编码               |
-| humidity               | float  | 湿度（%）              |
-| windSpeed              | float  | 风速（m/s）            |
-| cloud                  | int    | 云量（%）              |
-| is\_work               | int    | 是否工作日（0/1）         |
-| is\_peak               | int    | 是否峰时段（0/1）         |
+字段说明
+
+字段	必填	类型	说明
+station_id	✔	string/int	请求预测的场站 ID
+past_data	✔	array	长度必须 480，时间间隔 15 min，并且连续不缺口
+├─ energy_date	✔	ISO-8601	时间戳；如 2023-08-01T00:15:00
+├─ load_discharge_delta	✔	float	15 min 负荷 / 功率值
+├─ temp / humidity / windSpeed	✔	float	同训练数据度量单位保持一致
+├─ is_work	✖	0 / 1	是否工作日（缺省时由 API 依据节假日 & 周几推导）
+└─ is_peak	✖	0 / 1	是否 高峰时段 08:30-17:30（缺省时由 API 自动推导）
+future_external	✔	array	长度必须 672；字段同 past_data，但不含负荷值
 
 3.返回示例:
 {
-  "station_ref_id": "STATION_001",
+  "station_id": "9001",
+  "model_used": "station",             // "station" = 单站微调模型; "base" = 通用基础模型
   "predictions": [
     {
-      "energy_date": "2025-07-15T00:00:00Z",
-      "load": 150.2
+      "energy_date": "2023-08-06T00:00:00",
+      "load_discharge_delta_pred": 135.72
     },
-    ...
+    {
+      "energy_date": "2023-08-06T00:15:00",
+      "load_discharge_delta_pred": 136.05
+    },
+    …
+    {
+      "energy_date": "2023-08-12T23:45:00",
+      "load_discharge_delta_pred": 128.43
+    }
   ]
 }
