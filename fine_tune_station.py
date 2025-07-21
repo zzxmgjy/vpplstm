@@ -19,7 +19,7 @@ parser.add_argument('--station_id', required=True)
 parser.add_argument('--file',       required=True)
 args = parser.parse_args()
 # -------- 用户配置 --------
-STATION_ID  = args.station_id           # ← 场站 ID
+STATION_ID  = args.station_id # ← 场站 ID           # ← 场站 ID
 CSV_FILE    = args.file # ← 该场站 CSV
 EPOCHS      = 40
 BATCH_SIZE  = 128
@@ -175,17 +175,31 @@ for ep in range(1, EPOCHS + 1):
             print(log); break
     print(log)
 
-# ---------- Quick MAPE / RMSE ----------
+# ---------- Quick MAPE / RMSE  +  每日 MAPE ----------
+def calc_day_mape(true_arr, pred_arr):
+    return [mean_absolute_percentage_error(
+                np.where(true_arr[d*96:(d+1)*96]==0,1e-6,true_arr[d*96:(d+1)*96]),
+                pred_arr[d*96:(d+1)*96])*100
+            for d in range(7)]
+
 model.eval()
 with torch.no_grad():
     xe = torch.from_numpy(Xp[-1:].astype(np.float32)).to(device)
     xd = torch.from_numpy(Xf[-1:].astype(np.float32)).to(device)
-    pred_scaled = model(xe, xd).cpu().numpy().flatten()
-    pred = sc_y.inverse_transform(pred_scaled.reshape(-1,1)).flatten()
-    true = sc_y.inverse_transform(Y[-1:].reshape(-1,1)).flatten()
-    true_safe = np.where(true == 0, 1e-6, true)
-    mape = mean_absolute_percentage_error(true_safe, pred) * 100
-    rmse = np.sqrt(mean_squared_error(true, pred))
-    print(f'\n【{STATION_ID}】 quick-MAPE = {mape:.2f}%   RMSE = {rmse:.2f}')
+    pred_s = model(xe, xd).cpu().numpy().flatten()
+    pred   = sc_y.inverse_transform(pred_s.reshape(-1,1)).flatten()
+    true   = sc_y.inverse_transform(Y[-1:].reshape(-1,1)).flatten()
+
+    # --- 整段 ---
+    true_safe = np.where(true==0,1e-6,true)
+    mape_all  = mean_absolute_percentage_error(true_safe, pred)*100
+    rmse_all  = np.sqrt(mean_squared_error(true,pred))
+
+    # --- 每日 ---
+    day_mape = calc_day_mape(true, pred)
+    day_mape_str = ' | '.join([f'D{idx+1}:{m:.2f}%' for idx,m in enumerate(day_mape)])
+
+    print(f'\n【{STATION_ID}】7-day MAPE={mape_all:.2f}%  RMSE={rmse_all:.2f}')
+    print(f'【{STATION_ID}】Day-wise MAPE  {day_mape_str}')
 
 print('\n微调完成 ✅  模型保存至 output_pytorch/mode_<ID>/model_optimized_<ID>.pth')

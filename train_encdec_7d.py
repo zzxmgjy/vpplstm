@@ -164,32 +164,57 @@ joblib.dump(sc_enc, 'output_pytorch/scaler_enc.pkl')
 joblib.dump(sc_dec, 'output_pytorch/scaler_dec.pkl')
 joblib.dump(sc_y  , 'output_pytorch/scaler_y.pkl')
 
-# ---------- 8. 快速评估 ----------
+# ---------- 8. 快速评估（新增每日 MAPE） ----------
+def calc_day_mape(true_arr, pred_arr):
+    """把 672 个点按 96 切 7 段，返回长度 7 的 MAPE 列表"""
+    mape_list = []
+    for d in range(7):
+        s, e = d*96, (d+1)*96
+        t_slice = true_arr[s:e]
+        p_slice = pred_arr[s:e]
+        t_safe  = np.where(t_slice==0, 1e-6, t_slice)
+        mape_list.append(mean_absolute_percentage_error(t_safe, p_slice)*100)
+    return mape_list
+
 model.eval()
 all_pred, all_true = [], []
+all_day_mape = [[] for _ in range(7)]        # 收集跨场站的 Day1~7 MAPE
+
 with torch.no_grad():
     for sid, grp in df.groupby('station_ref_id'):
         if len(grp) < CFG['past_steps'] + CFG['future_steps']:
             continue
+
         window = grp.tail(CFG['past_steps'] + CFG['future_steps'])
         xe = sc_enc.transform(window[ENC_COLS])[:CFG['past_steps']].astype(np.float32)
         xd = sc_dec.transform(window[DEC_COLS])[CFG['past_steps']:].astype(np.float32)
         xe = torch.from_numpy(xe).unsqueeze(0).to(device)
         xd = torch.from_numpy(xd).unsqueeze(0).to(device)
+
         pred_scaled = model(xe, xd).cpu().numpy().flatten()
         pred = sc_y.inverse_transform(pred_scaled.reshape(-1, 1)).flatten()
         true = window.tail(CFG['future_steps'])['load_discharge_delta'].values
-        true_safe = np.where(true == 0, 1e-6, true)
-        mape = mean_absolute_percentage_error(true_safe, pred) * 100
-        rmse = np.sqrt(mean_squared_error(true, pred))
-        print(f'{sid}  MAPE={mape:.2f}%  RMSE={rmse:.2f}')
+
+        # --- 每日 MAPE ---
+        day_mape = calc_day_mape(true, pred)
+        day_mape_str = ' | '.join([f'D{idx+1}:{m:.2f}%' for idx, m in enumerate(day_mape)])
+        print(f'{sid}  Day-wise MAPE  {day_mape_str}')
+
+        # 汇总
+        for i, m in enumerate(day_mape):
+            all_day_mape[i].append(m)
         all_pred.append(pred); all_true.append(true)
 
+# ---- 汇总整体 ----
 if all_true:
-    overall_mape = mean_absolute_percentage_error(
-        np.concatenate(all_true), np.concatenate(all_pred)) * 100
-    overall_rmse = np.sqrt(mean_squared_error(
-        np.concatenate(all_true), np.concatenate(all_pred)))
-    print(f'\nOverall  MAPE={overall_mape:.2f}%  RMSE={overall_rmse:.2f}')
+    overall_mape = mean_absolute_percentage_error(np.concatenate(all_true),
+                                                  np.concatenate(all_pred))*100
+    overall_rmse = np.sqrt(mean_squared_error(np.concatenate(all_true),
+                                              np.concatenate(all_pred)))
+    print('\nOverall Day-wise MAPE')
+    for i, lst in enumerate(all_day_mape):
+        print(f'  Day {i+1}: {np.mean(lst):.2f}%')
 
-print('\n基础模型训练 & 评估结束 ✅')
+    print(f'\nOverall 7-day MAPE={overall_mape:.2f}%  RMSE={overall_rmse:.2f}')
+
+print('\n基础模型训练 & 评估完成 ✅')
