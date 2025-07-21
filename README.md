@@ -22,8 +22,8 @@ POST /predict
 Content-Type: application/json
 3. 请求体示例
 {
-  "station_id": "9001",          // string/int 均可
-  "past_data": [                 // 连续 480 条历史 15min 样本（5 天）
+  "station_id": 9001,          // int 
+  "past_data": [                 // 连续 576 条历史 15min 样本（5 天,比如7-10号到07-15号所有15分钟数据）
     {
       "energy_date": "2023-08-01T00:00:00",
       "load_discharge_delta": 123.4,
