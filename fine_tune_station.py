@@ -14,14 +14,14 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 warnings.filterwarnings("ignore")
 
 # ---------- CLI ----------
-parser = argparse.ArgumentParser()
-parser.add_argument('--station_id', required=True)
-parser.add_argument('--file',       required=True)
-args = parser.parse_args()
+# parser = argparse.ArgumentParser()
+# parser.add_argument('--station_id', required=True)
+# parser.add_argument('--file',       required=True)
+# args = parser.parse_args()
 # -------- 用户配置 --------
-STATION_ID  = args.station_id # ← 场站 ID           # ← 场站 ID
-CSV_FILE    = args.file # ← 该场站 CSV
-EPOCHS      = 40
+STATION_ID  = 1749985246419357696 # ← 场站 ID           # ← 场站 ID
+CSV_FILE    = 'load.csv' # ← 该场站 CSV
+EPOCHS      = 50
 BATCH_SIZE  = 128
 # --------------------------
 
