@@ -1,11 +1,8 @@
 # fine_tune_station.py
 # ==========================================================
-# 单站微调脚本（无需命令行参数）
-# ----------------------------------------------------------
-#  使用前修改： STATION_ID / CSV_FILE / EPOCHS / BATCH_SIZE
+# 单站微调（使用 WeightedL1 + prev_load Teacher-Forcing）
 # ==========================================================
-
-import os,argparse, warnings, holidays, joblib
+import os, warnings, holidays, joblib
 import pandas as pd, numpy as np
 from sklearn.metrics import mean_absolute_percentage_error, mean_squared_error
 import torch, torch.nn as nn
@@ -13,31 +10,25 @@ from torch.utils.data import DataLoader, TensorDataset
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 warnings.filterwarnings("ignore")
 
-# ---------- CLI ----------
-# parser = argparse.ArgumentParser()
-# parser.add_argument('--station_id', required=True)
-# parser.add_argument('--file',       required=True)
-# args = parser.parse_args()
-# -------- 用户配置 --------
-STATION_ID  = 3205103743359 # ← 场站 ID           # ← 场站 ID
-CSV_FILE    = 'loaddata.csv' # ← 该场站 CSV
+# ---------- 用户配置 ----------
+STATION_ID  = 3205103743359       # ← 修改为目标场站
+CSV_FILE    = 'loaddata.csv'      # ← 该场站 CSV
 EPOCHS      = 50
 BATCH_SIZE  = 128
-# --------------------------
+# --------------------------------
 
-ROOT       = 'output_pytorch'
-PAST_STEPS = 96*5
-FUT_STEPS  = 96*7
+ROOT        = 'output_pytorch'
+PAST_STEPS  = 96*5
+FUT_STEPS   = 96*7                # 672
 
-# ---------- is_peak 08:30~17:30 ----------
+# ---------- is_peak ----------
 def make_is_peak(ts):
-    h  = ts.dt.hour
-    mi = ts.dt.minute
+    h, mi = ts.dt.hour, ts.dt.minute
     s  = (h > 8) | ((h == 8) & (mi >= 30))
     e  = (h < 17) | ((h == 17) & (mi <= 30))
     return (s & e).astype(int)
 
-# ---------- 读取数据 ----------
+# ---------- 读数据 ----------
 df = pd.read_csv(CSV_FILE, parse_dates=['energy_date'])
 if 'station_ref_id' in df.columns:
     df = df[df['station_ref_id'] == STATION_ID]
@@ -45,62 +36,64 @@ df = df.sort_values('energy_date')
 if df.empty:
     raise ValueError('CSV 中没有指定场站的数据')
 
-# ---------- enrich 基础特征 ----------
+# ---------- enrich（保持与总模型一致） ----------
 cn_holidays = holidays.country_holidays('CN')
 def enrich(d):
-    d['hour']     = d['energy_date'].dt.hour
-    d['minute']   = d['energy_date'].dt.minute
-    d['weekday']  = d['energy_date'].dt.weekday
-    d['temp_squared'] = d['temp']**2
+    d['hour']    = d['energy_date'].dt.hour
+    d['minute']  = d['energy_date'].dt.minute
+    d['weekday'] = d['energy_date'].dt.weekday
+    d['month']   = d['energy_date'].dt.month
+    d['day']     = d['energy_date'].dt.day
+
+    d['dew_point']  = d['temp'] - (100-d['humidity'])/5
+    d['feels_like'] = d['temp'] + 0.33*d['humidity'] - 4
+    for k in [1,24]:
+        d[f'temp_diff{k}'] = d['temp'].diff(k)
+
     d['sin_hour'] = np.sin(2*np.pi*(d['hour']+d['minute']/60)/24)
     d['cos_hour'] = np.cos(2*np.pi*(d['hour']+d['minute']/60)/24)
     d['sin_wday'] = np.sin(2*np.pi*d['weekday']/7)
     d['cos_wday'] = np.cos(2*np.pi*d['weekday']/7)
+
     d['is_holiday'] = d['energy_date'].isin(cn_holidays).astype(int)
-    if 'is_work' not in d.columns:
-        d['is_work'] = ((d['weekday'] < 5) & (d['is_holiday'] == 0)).astype(int)
-    if 'is_peak' not in d.columns:
-        d['is_peak'] = make_is_peak(d['energy_date'])
+    d['is_work']    = ((d['weekday']<5)&(~d['energy_date'].isin(cn_holidays))).astype(int)
+    d['is_peak']    = make_is_peak(d['energy_date']).astype(int)
     return d
 df = enrich(df)
 
-# ---------- 负荷衍生 ----------
-for lag in [1,4,24,96]:
+# ---------- 滞后 / rolling（与总模型保持一致即可） ----------
+for lag in [1,2,4,8,12,24,48,96]:
     df[f'load_lag{lag}'] = df['load_discharge_delta'].shift(lag)
-for w in [4,24,96]:
+for w in [4,8,12,24,48,96]:
     df[f'load_ma{w}']  = df['load_discharge_delta'].rolling(w,1).mean()
     df[f'load_std{w}'] = df['load_discharge_delta'].rolling(w,1).std()
-df = df.fillna(method='ffill').dropna()
+
+# prev_load (teacher forcing)
+df['prev_load'] = df['load_discharge_delta'].shift(1)
+
+df = df.fillna(method='ffill').fillna(method='bfill').dropna()
 if len(df) < PAST_STEPS + FUT_STEPS:
     raise ValueError('数据量不足以微调')
 
-# ---------- 特征列 ----------
-ENC = [
-    'temp','temp_squared','humidity','windSpeed',
-    'load_lag1','load_lag4','load_lag24','load_lag96',
-    'load_ma4','load_ma24','load_ma96',
-    'load_std4','load_std24','load_std96',
-    'is_holiday','is_work','is_peak',
-    'sin_hour','cos_hour','sin_wday','cos_wday'
-]
-DEC = [
-    'temp','humidity','windSpeed',
-    'is_holiday','is_work','is_peak',
-    'sin_hour','cos_hour','sin_wday','cos_wday'
-]
+# ---------- 载入  enc_cols / dec_cols & scaler ----------
+enc_cols = joblib.load(f'{ROOT}/enc_cols.pkl')
+dec_cols = joblib.load(f'{ROOT}/dec_cols.pkl')
+sc_enc   = joblib.load(f'{ROOT}/scaler_enc.pkl')
+sc_dec   = joblib.load(f'{ROOT}/scaler_dec.pkl')
+sc_y     = joblib.load(f'{ROOT}/scaler_y.pkl')
 
-# ---------- 载入 scaler ----------
-sc_enc = joblib.load(f'{ROOT}/scaler_enc.pkl')
-sc_dec = joblib.load(f'{ROOT}/scaler_dec.pkl')
-sc_y   = joblib.load(f'{ROOT}/scaler_y.pkl')
+# 若缺少列则补 0，确保维度一致
+for col in set(enc_cols + dec_cols):
+    if col not in df.columns:
+        df[col] = 0
 
-# ---------- 制作训练样本 ----------
-def make_data(ds):
+# ---------- 制作滑窗 ----------
+def make_ds(data):
     Xp, Xf, Ys = [], [], []
-    enc = sc_enc.transform(ds[ENC])
-    dec = sc_dec.transform(ds[DEC])
-    y   = sc_y.transform(ds[['load_discharge_delta']])
-    for i in range(len(ds) - PAST_STEPS - FUT_STEPS + 1):
+    enc = sc_enc.transform(data[enc_cols])
+    dec = sc_dec.transform(data[dec_cols])
+    y   = sc_y.transform(data[['load_discharge_delta']])
+    for i in range(len(data) - PAST_STEPS - FUT_STEPS + 1):
         Xp.append(enc[i:i+PAST_STEPS])
         Xf.append(dec[i+PAST_STEPS:i+PAST_STEPS+FUT_STEPS])
         Ys.append(y[i+PAST_STEPS:i+PAST_STEPS+FUT_STEPS, 0])
@@ -108,8 +101,8 @@ def make_data(ds):
             np.array(Xf, np.float32),
             np.array(Ys, np.float32))
 
-Xp, Xf, Y = make_data(df)
-split = int(.8 * len(Xp))
+Xp, Xf, Y = make_ds(df)
+split = int(.8*len(Xp))
 tr_ds = TensorDataset(torch.from_numpy(Xp[:split]),
                       torch.from_numpy(Xf[:split]),
                       torch.from_numpy(Y[:split]))
@@ -119,87 +112,101 @@ va_ds = TensorDataset(torch.from_numpy(Xp[split:]),
 tr_loader = DataLoader(tr_ds, batch_size=BATCH_SIZE, shuffle=True)
 va_loader = DataLoader(va_ds, batch_size=BATCH_SIZE, shuffle=False)
 
-# ---------- 构建模型 ----------
+# ---------- 模型结构（与总模型一致） ----------
 class EncDec(nn.Module):
-    def __init__(self, d_enc, d_dec, hid, fut, drop):
+    def __init__(self, d_enc, d_dec, hid, drop):
         super().__init__()
         self.enc = nn.LSTM(d_enc, hid, batch_first=True)
         self.dec = nn.LSTM(d_dec, hid, batch_first=True)
         self.dp  = nn.Dropout(drop)
         self.fc  = nn.Linear(hid, 1)
     def forward(self, xe, xd):
-        _, (h, c) = self.enc(xe)
-        out, _ = self.dec(xd, (h, c))
+        _, (h,c) = self.enc(xe)
+        out,_ = self.dec(xd,(h,c))
         return self.fc(self.dp(out)).squeeze(-1)
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model  = EncDec(len(ENC), len(DEC), 128, FUT_STEPS, .24).to(device)
-model.load_state_dict(torch.load(f'{ROOT}/model_base_encdec7d.pth', map_location=device))
-for p in model.enc.parameters(): p.requires_grad_(False)   # 冻结 Encoder
+# ---------- 加权 L1  ----------
+class WeightedL1(nn.Module):
+    def __init__(self, fut, device):
+        super().__init__()
+        w = np.concatenate([
+            np.ones(96*2),        # Day1-2
+            np.ones(96)*1.3,      # Day3
+            np.ones(96)*1.5,      # Day4
+            np.ones(96*3)*1.2     # Day5-7
+        ])
+        self.register_buffer("w", torch.tensor(w, dtype=torch.float32, device=device))
+    def forward(self, pred, target):
+        return torch.mean(self.w * torch.abs(pred - target))
 
-criterion = nn.L1Loss()
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model  = EncDec(len(enc_cols), len(dec_cols), 128, .24).to(device)
+model.load_state_dict(torch.load(f'{ROOT}/model_weighted.pth', map_location=device))
+
+# ------ 只微调 Decoder + FC ------
+for p in model.enc.parameters():
+    p.requires_grad_(False)
+
+criterion = WeightedL1(FUT_STEPS, device)
 optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=1e-4)
 scheduler = ReduceLROnPlateau(optimizer, 'min', patience=3, factor=.5)
 
-best, patience = 1e9, 0
-for ep in range(1, EPOCHS + 1):
-    # ---- train ----
-    model.train(); tr = 0
-    for xe, xd, yy in tr_loader:
-        xe, xd, yy = xe.to(device), xd.to(device), yy.to(device)
+best, wait = 1e9, 0
+print(f"\n🚀 开始微调  station={STATION_ID}  samples={len(tr_ds)} / {len(va_ds)}")
+for ep in range(1, EPOCHS+1):
+    model.train(); tr=0
+    for xe,xd,yy in tr_loader:
+        xe,xd,yy = xe.to(device), xd.to(device), yy.to(device)
         optimizer.zero_grad()
-        loss = criterion(model(xe, xd), yy)
+        loss = criterion(model(xe,xd), yy)
         loss.backward(); optimizer.step()
         tr += loss.item()
     tr /= len(tr_loader)
 
-    # ---- valid ----
-    model.eval(); va = 0
+    model.eval(); va=0
     with torch.no_grad():
-        for xe, xd, yy in va_loader:
-            xe, xd, yy = xe.to(device), xd.to(device), yy.to(device)
-            va += criterion(model(xe, xd), yy).item()
-    va /= len(va_loader)
-    scheduler.step(va)
+        for xe,xd,yy in va_loader:
+            xe,xd,yy = xe.to(device), xd.to(device), yy.to(device)
+            va += criterion(model(xe,xd), yy).item()
+    va /= len(va_loader); scheduler.step(va)
 
     log = f'E{ep:03d}  tr {tr:.4f}  va {va:.4f}'
     if va < best:
-        best = va; patience = 0
-        folder = os.path.join(ROOT, f'mode_{STATION_ID}'); os.makedirs(folder, exist_ok=True)
-        torch.save(model.state_dict(), os.path.join(folder, f'model_optimized_{STATION_ID}.pth'))
-        log += ' ✔ save'
+        best = va; wait = 0
+        folder = f'{ROOT}/model_{STATION_ID}'; os.makedirs(folder, exist_ok=True)
+        torch.save(model.state_dict(), f'{folder}/model_optimized_{STATION_ID}.pth')
+        log += '  ✔ save'
     else:
-        patience += 1
-        if patience >= 10:
-            log += ' (early stop)'
-            print(log); break
+        wait += 1
+        if wait >= 10:
+            log += '  (early stop)'; print(log); break
     print(log)
 
-# ---------- Quick MAPE / RMSE  +  每日 MAPE ----------
-def calc_day_mape(true_arr, pred_arr):
-    return [mean_absolute_percentage_error(
-                np.where(true_arr[d*96:(d+1)*96]==0,1e-6,true_arr[d*96:(d+1)*96]),
-                pred_arr[d*96:(d+1)*96])*100
-            for d in range(7)]
+# ---------- 评估 ----------
+def day_mape(t,p):
+    res=[]
+    for d in range(7):
+        s,e=d*96,(d+1)*96
+        t0,t1=t[s:e],p[s:e]
+        t0=np.where(t0==0,1e-6,t0)
+        res.append(mean_absolute_percentage_error(t0,t1)*100)
+    return res
 
 model.eval()
 with torch.no_grad():
     xe = torch.from_numpy(Xp[-1:].astype(np.float32)).to(device)
     xd = torch.from_numpy(Xf[-1:].astype(np.float32)).to(device)
-    pred_s = model(xe, xd).cpu().numpy().flatten()
+    pred_s = model(xe,xd).cpu().numpy().flatten()
     pred   = sc_y.inverse_transform(pred_s.reshape(-1,1)).flatten()
     true   = sc_y.inverse_transform(Y[-1:].reshape(-1,1)).flatten()
 
-    # --- 整段 ---
     true_safe = np.where(true==0,1e-6,true)
-    mape_all  = mean_absolute_percentage_error(true_safe, pred)*100
+    mape_all  = mean_absolute_percentage_error(true_safe,pred)*100
     rmse_all  = np.sqrt(mean_squared_error(true,pred))
 
-    # --- 每日 ---
-    day_mape = calc_day_mape(true, pred)
-    day_mape_str = ' | '.join([f'D{idx+1}:{m:.2f}%' for idx,m in enumerate(day_mape)])
+    dm = day_mape(true,pred)
+    dm_str = ' | '.join([f'D{i+1}:{m:.2f}%' for i,m in enumerate(dm)])
 
-    print(f'\n【{STATION_ID}】7-day MAPE={mape_all:.2f}%  RMSE={rmse_all:.2f}')
-    print(f'【{STATION_ID}】Day-wise MAPE  {day_mape_str}')
-
-print('\n微调完成 ✅  模型保存至 output_pytorch/mode_<ID>/model_optimized_<ID>.pth')
+print(f'\n📊 【{STATION_ID}】7-day MAPE={mape_all:.2f}%  RMSE={rmse_all:.2f}')
+print(f'📊 【{STATION_ID}】Day-wise MAPE  {dm_str}')
+print(f'\n✅ 微调完成  模型已保存至 output_pytorch/model_{STATION_ID}/model_optimized_{STATION_ID}.pth')

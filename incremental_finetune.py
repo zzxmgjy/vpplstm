@@ -1,105 +1,100 @@
 # incremental_finetune.py
 # =========================================================
-# 增量微调脚本（每 15 天或任意周期）
-# 修改 CONFIG 部分即可运行
+# 增量微调单站模型  (与 WeightedL1 + prev_load 逻辑一致)
 # =========================================================
-import os, warnings, holidays, joblib, pandas as pd, numpy as np
-from sklearn.metrics import mean_absolute_percentage_error, mean_squared_error
+import os, warnings, joblib, holidays, pandas as pd, numpy as np
+from sklearn.metrics import mean_absolute_percentage_error
 import torch, torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 warnings.filterwarnings("ignore")
 
 # ---------------- CONFIG ----------------
-STATION_ID  = 3205103743359                    # 目标场站
-NEW_CSV     = 'loaddata.csv'  # 新增 15 天数据
+STATION_ID  = 3205103743359      # ← 目标场站
+NEW_CSV     = 'loaddata.csv'     # ← 新增数据 (近 15 天 或任意周期)
 EPOCHS      = 15
 BATCH_SIZE  = 128
-LR_INCR     = 2.16485e-4                      # 增量更小 LR
-# ----------------------------------------
+LR_INCR     = 2e-4               # 增量学习率
+# ---------------------------------------
 
 ROOT        = 'output_pytorch'
-MODE_DIR    = os.path.join(ROOT, f'mode_{STATION_ID}')
-os.makedirs(MODE_DIR, exist_ok=True)
+MODEL_DIR   = f'{ROOT}/model_{STATION_ID}'
+os.makedirs(MODEL_DIR, exist_ok=True)
 
-PAST, FUT   = 96*5, 96*7                 # 480 / 672
+PAST, FUT   = 96*5, 96*7
 DEVICE      = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# ---------- PEAK 时段 08:30~17:30 ----------
+# ---------- is_peak ----------
 def make_is_peak(ts):
-    h  = ts.dt.hour; mi = ts.dt.minute
+    h,mi = ts.dt.hour, ts.dt.minute
     return (((h>8)|((h==8)&(mi>=30))) & ((h<17)|((h==17)&(mi<=30)))).astype(int)
 
-# ---------- 读取尾巴缓存 ----------
-TAIL_PATH = os.path.join(MODE_DIR, f'tail_cache_{STATION_ID}.csv')
-if os.path.exists(TAIL_PATH):
-    old_tail = pd.read_csv(TAIL_PATH, parse_dates=['energy_date'])
-else:
-    old_tail = pd.DataFrame()
+# ---------- 读取尾巴缓存 (上次 PAST+FUT) ----------
+TAIL_PATH = f'{MODEL_DIR}/tail_cache_{STATION_ID}.csv'
+old_tail  = pd.read_csv(TAIL_PATH, parse_dates=['energy_date']) if os.path.exists(TAIL_PATH) else pd.DataFrame()
 
 # ---------- 读取新增 CSV ----------
 df_new = pd.read_csv(NEW_CSV, parse_dates=['energy_date'])
 if 'station_ref_id' in df_new.columns:
     df_new = df_new[df_new['station_ref_id'] == STATION_ID]
-if df_new.empty: raise ValueError('新增 CSV 中无该场站数据')
+if df_new.empty:
+    raise ValueError('新增 CSV 中无该场站数据')
 
-df = pd.concat([old_tail, df_new], ignore_index=True)
-df = df.sort_values('energy_date').reset_index(drop=True)
+# 合并、按时间排序
+df = pd.concat([old_tail, df_new], ignore_index=True).sort_values('energy_date').reset_index(drop=True)
 
-# ---------- enrich 函数 ----------
-CN_HOLIDAYS = holidays.country_holidays('CN')
+# ---------- enrich (必须与总模型一致) ----------
+cn_holidays = holidays.country_holidays('CN')
 def enrich(d):
-    d['hour']     = d['energy_date'].dt.hour
-    d['minute']   = d['energy_date'].dt.minute
-    d['weekday']  = d['energy_date'].dt.weekday
-    d['temp_squared'] = d['temp']**2
+    d['hour']    = d['energy_date'].dt.hour
+    d['minute']  = d['energy_date'].dt.minute
+    d['weekday'] = d['energy_date'].dt.weekday
+    d['month']   = d['energy_date'].dt.month
+    d['day']     = d['energy_date'].dt.day
+
+    d['dew_point']  = d['temp'] - (100-d['humidity'])/5
+    d['feels_like'] = d['temp'] + 0.33*d['humidity'] - 4
+    for k in [1,24]:
+        d[f'temp_diff{k}'] = d['temp'].diff(k)
+
     d['sin_hour'] = np.sin(2*np.pi*(d['hour']+d['minute']/60)/24)
     d['cos_hour'] = np.cos(2*np.pi*(d['hour']+d['minute']/60)/24)
     d['sin_wday'] = np.sin(2*np.pi*d['weekday']/7)
     d['cos_wday'] = np.cos(2*np.pi*d['weekday']/7)
-    d['is_holiday'] = d['energy_date'].isin(CN_HOLIDAYS).astype(int)
-    if 'is_work' not in d.columns:
-        d['is_work'] = ((d['weekday']<5) & (d['is_holiday']==0)).astype(int)
-    if 'is_peak' not in d.columns:
-        d['is_peak'] = make_is_peak(d['energy_date'])
+
+    d['is_holiday'] = d['energy_date'].isin(cn_holidays).astype(int)
+    d['is_work']    = ((d['weekday']<5)&(~d['energy_date'].isin(cn_holidays))).astype(int)
+    d['is_peak']    = make_is_peak(d['energy_date']).astype(int)
     return d
 df = enrich(df)
 
-# ---------- 负荷衍生特征 ----------
-for lag in [1,4,24,96]:
+# ---------- 滞后 / rolling + prev_load ----------
+for lag in [1,2,4,8,12,24,48,96]:
     df[f'load_lag{lag}'] = df['load_discharge_delta'].shift(lag)
-for w in [4,24,96]:
+for w in [4,8,12,24,48,96]:
     df[f'load_ma{w}']  = df['load_discharge_delta'].rolling(w,1).mean()
     df[f'load_std{w}'] = df['load_discharge_delta'].rolling(w,1).std()
-df = df.fillna(method='ffill').dropna()
+df['prev_load'] = df['load_discharge_delta'].shift(1)
 
-# ---------- Feature Lists (dump / load) ----------
-ENC_COLS = [
-    'temp','temp_squared','humidity','windSpeed',
-    'load_lag1','load_lag4','load_lag24','load_lag96',
-    'load_ma4','load_ma24','load_ma96',
-    'load_std4','load_std24','load_std96',
-    'is_holiday','is_work','is_peak',
-    'sin_hour','cos_hour','sin_wday','cos_wday'
-]
-DEC_COLS = [
-    'temp','humidity','windSpeed',
-    'is_holiday','is_work','is_peak',
-    'sin_hour','cos_hour','sin_wday','cos_wday'
-]
-# 把列列表也存一份，方便其他脚本统一使用
-joblib.dump(ENC_COLS, f'{ROOT}/enc_cols.pkl')
-joblib.dump(DEC_COLS, f'{ROOT}/dec_cols.pkl')
+df = df.fillna(method='ffill').fillna(method='bfill').dropna()
 
-# ---------- Scaler ----------
-sc_enc = joblib.load(f'{ROOT}/scaler_enc.pkl')
-sc_dec = joblib.load(f'{ROOT}/scaler_dec.pkl')
-sc_y   = joblib.load(f'{ROOT}/scaler_y.pkl')
+# ---------- 载入特征列 & Scaler ----------
+enc_cols = joblib.load(f'{ROOT}/enc_cols.pkl')
+dec_cols = joblib.load(f'{ROOT}/dec_cols.pkl')
+sc_enc   = joblib.load(f'{ROOT}/scaler_enc.pkl')
+sc_dec   = joblib.load(f'{ROOT}/scaler_dec.pkl')
+sc_y     = joblib.load(f'{ROOT}/scaler_y.pkl')
 
-def windowize(data):
+# 补全缺失列
+for col in set(enc_cols + dec_cols):
+    if col not in df.columns:
+        df[col] = 0
+
+# ---------- 滑窗 ----------
+def make_ds(data):
     Xp,Xf,Y = [],[],[]
-    enc = sc_enc.transform(data[ENC_COLS])
-    dec = sc_dec.transform(data[DEC_COLS])
+    enc = sc_enc.transform(data[enc_cols])
+    dec = sc_dec.transform(data[dec_cols])
     y   = sc_y.transform(data[['load_discharge_delta']])
     for i in range(len(data)-PAST-FUT+1):
         Xp.append(enc[i:i+PAST])
@@ -107,9 +102,9 @@ def windowize(data):
         Y.append(y[i+PAST:i+PAST+FUT,0])
     return np.array(Xp,np.float32), np.array(Xf,np.float32), np.array(Y,np.float32)
 
-Xp,Xf,Y = windowize(df)
-if len(Xp)==0: raise ValueError('增量数据不足形成任何滑窗样本')
-
+Xp,Xf,Y = make_ds(df)
+if len(Xp)==0:
+    raise ValueError('增量数据不足以形成滑窗样本')
 loader = DataLoader(TensorDataset(torch.from_numpy(Xp),
                                   torch.from_numpy(Xf),
                                   torch.from_numpy(Y)),
@@ -117,58 +112,79 @@ loader = DataLoader(TensorDataset(torch.from_numpy(Xp),
 
 # ---------- 模型 ----------
 class EncDec(nn.Module):
-    def __init__(self,d1,d2,hid,fut,drop):
+    def __init__(self,d_enc,d_dec,hid,drop):
         super().__init__()
-        self.enc = nn.LSTM(d1,hid,batch_first=True)
-        self.dec = nn.LSTM(d2,hid,batch_first=True)
-        self.dp  = nn.Dropout(drop); self.fc=nn.Linear(hid,1)
+        self.enc = nn.LSTM(d_enc,hid,batch_first=True)
+        self.dec = nn.LSTM(d_dec,hid,batch_first=True)
+        self.dp  = nn.Dropout(drop); self.fc = nn.Linear(hid,1)
     def forward(self,xe,xd):
         _,(h,c)=self.enc(xe)
-        y,_=self.dec(xd,(h,c))
-        return self.fc(self.dp(y)).squeeze(-1)
+        out,_ = self.dec(xd,(h,c))
+        return self.fc(self.dp(out)).squeeze(-1)
 
-model = EncDec(len(ENC_COLS),len(DEC_COLS),128,FUT,.24).to(DEVICE)
-opt_path = os.path.join(MODE_DIR, f'model_optimized_{STATION_ID}.pth')
+# --- Weighted L1 (与总模型保持一致) ---
+class WeightedL1(nn.Module):
+    def __init__(self,fut,device):
+        super().__init__()
+        w = np.concatenate([
+            np.ones(96*2),
+            np.ones(96)*1.3,
+            np.ones(96)*1.5,
+            np.ones(96*3)*1.2])
+        self.register_buffer('w', torch.tensor(w,dtype=torch.float32,device=device))
+    def forward(self,pred,tgt):
+        return torch.mean(self.w*torch.abs(pred-tgt))
+
+model = EncDec(len(enc_cols), len(dec_cols), 128, .24).to(DEVICE)
+
+# --- 载入历史权重 ---
+opt_path = f'{MODEL_DIR}/model_optimized_{STATION_ID}.pth'
+base_path= f'{ROOT}/model_weighted.pth'   # 你的总模型权重
 if os.path.exists(opt_path):
     model.load_state_dict(torch.load(opt_path, map_location=DEVICE))
-    print('>>> 载入既有微调权重')
+    print(">>> 加载已微调权重")
 else:
-    model.load_state_dict(torch.load(f'{ROOT}/model_base_encdec7d.pth', map_location=DEVICE))
-    print('>>> 首次微调：载入基础权重')
+    model.load_state_dict(torch.load(base_path, map_location=DEVICE))
+    print(">>> 加载基础权重（首次增量）")
 
-for p in model.enc.parameters(): p.requires_grad_(False)
+# 冻结 Encoder
+for p in model.enc.parameters():
+    p.requires_grad_(False)
 
-criterion = nn.L1Loss()
-optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=LR_INCR)
-scheduler = ReduceLROnPlateau(optimizer, 'min', patience=2, factor=.5)
+criterion = WeightedL1(FUT, DEVICE)
+optimizer = torch.optim.Adam(filter(lambda p:p.requires_grad, model.parameters()), lr=LR_INCR)
+scheduler = ReduceLROnPlateau(optimizer,'min',patience=2,factor=.5)
 
-best = float('inf'); pat = 0
-for ep in range(1, EPOCHS+1):
-    model.train(); ep_loss = 0
+best=float('inf'); wait=0
+print(f"🚀 增量训练样本 {len(loader.dataset)}   batch {BATCH_SIZE}")
+for ep in range(1,EPOCHS+1):
+    model.train(); ep_loss=0
     for xe,xd,yy in loader:
-        xe,xd,yy = xe.to(DEVICE), xd.to(DEVICE), yy.to(DEVICE)
-        optimizer.zero_grad(); loss = criterion(model(xe,xd), yy)
+        xe,xd,yy = xe.to(DEVICE),xd.to(DEVICE),yy.to(DEVICE)
+        optimizer.zero_grad()
+        loss = criterion(model(xe,xd),yy)
         loss.backward(); optimizer.step()
         ep_loss += loss.item()
-    ep_loss /= len(loader)
-    scheduler.step(ep_loss)
-    msg = f'Increment E{ep:02d} loss {ep_loss:.4f}'
-    if ep_loss < best:
-        best = ep_loss; pat = 0
-        torch.save(model.state_dict(), opt_path)
-        msg += ' ✔ save'
-    else:
-        pat += 1
-        if pat >= 4: msg += ' (early)'; print(msg); break
-    print(msg)
+    ep_loss /= len(loader); scheduler.step(ep_loss)
 
-# ---------- Quick Evaluation (整体 + 按天) ----------
-def calc_day_mape(t, p):
+    log=f'E{ep:02d} loss {ep_loss:.4f}'
+    if ep_loss<best:
+        best=ep_loss; wait=0
+        torch.save(model.state_dict(), opt_path)
+        log+=' ✔ save'
+    else:
+        wait+=1
+        if wait>=4:
+            log+=' (early stop)'; print(log); break
+    print(log)
+
+# ---------- 简易评估 ----------
+def day_mape(t,p):
     res=[]
     for d in range(7):
         s,e=d*96,(d+1)*96
         res.append(mean_absolute_percentage_error(
-              np.where(t[s:e]==0,1e-6,t[s:e]), p[s:e])*100)
+            np.where(t[s:e]==0,1e-6,t[s:e]), p[s:e])*100)
     return res
 
 model.eval()
@@ -179,12 +195,12 @@ with torch.no_grad():
     pred  = sc_y.inverse_transform(pred_s.reshape(-1,1)).flatten()
     true  = sc_y.inverse_transform(Y[-1:].reshape(-1,1)).flatten()
 
-    mape_all = mean_absolute_percentage_error(
+    overall = mean_absolute_percentage_error(
         np.where(true==0,1e-6,true), pred)*100
-    day_mapes = calc_day_mape(true, pred)
-    print(f'\n【{STATION_ID}】7-day MAPE {mape_all:.2f}%')
-    print('Day-wise MAPE: ' + ' | '.join([f'D{d+1}:{m:.2f}%' for d,m in enumerate(day_mapes)]))
+    dm = day_mape(true,pred)
+print(f'\n📊 7-day MAPE {overall:.2f}%  | '+
+      '  '.join([f'D{i+1}:{m:.2f}%' for i,m in enumerate(dm)]))
 
-# ---------- 更新尾巴缓存 (保留 PAST+FUT 行) ----------
-df.tail(PAST+FUT).to_csv(TAIL_PATH, index=False)
-print('\n增量微调完成，权重 & 尾巴缓存已更新 ✅')
+# ---------- 更新尾巴缓存 ----------
+df.tail(PAST+FUT).to_csv(TAIL_PATH,index=False)
+print("\n✅ 增量微调完成，权重 & 尾巴缓存已更新")
