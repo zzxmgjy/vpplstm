@@ -11,8 +11,8 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 warnings.filterwarnings("ignore")
 
 # ---------------- CONFIG ----------------
-STATION_ID  = 1749985246419357696                    # 目标场站
-NEW_CSV     = 'load.csv'  # 新增 15 天数据
+STATION_ID  = 3205103743359                    # 目标场站
+NEW_CSV     = 'loaddata.csv'  # 新增 15 天数据
 EPOCHS      = 15
 BATCH_SIZE  = 128
 LR_INCR     = 2.16485e-4                      # 增量更小 LR

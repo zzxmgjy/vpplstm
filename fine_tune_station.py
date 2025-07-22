@@ -19,8 +19,8 @@ warnings.filterwarnings("ignore")
 # parser.add_argument('--file',       required=True)
 # args = parser.parse_args()
 # -------- 用户配置 --------
-STATION_ID  = 1749985246419357696 # ← 场站 ID           # ← 场站 ID
-CSV_FILE    = 'load.csv' # ← 该场站 CSV
+STATION_ID  = 3205103743359 # ← 场站 ID           # ← 场站 ID
+CSV_FILE    = 'loaddata.csv' # ← 该场站 CSV
 EPOCHS      = 50
 BATCH_SIZE  = 128
 # --------------------------
