@@ -1,6 +1,7 @@
 # fine_tune_station.py
 # ==========================================================
 # 单站微调（使用 WeightedL1 + prev_load Teacher-Forcing）
+# Updated for vpp_meter.csv with dual outputs (energy + power)
 # ==========================================================
 import os, warnings, holidays, joblib
 import pandas as pd, numpy as np
@@ -12,7 +13,7 @@ warnings.filterwarnings("ignore")
 
 # ---------- 用户配置 ----------
 STATION_ID  = 3205103743359       # ← 修改为目标场站
-CSV_FILE    = 'loaddata.csv'      # ← 该场站 CSV
+CSV_FILE    = 'vpp_meter.csv'    # ← 使用 vpp_meter.csv
 EPOCHS      = 50
 BATCH_SIZE  = 128
 # --------------------------------
@@ -29,12 +30,36 @@ def make_is_peak(ts):
     return (s & e).astype(int)
 
 # ---------- 读数据 ----------
-df = pd.read_csv(CSV_FILE, parse_dates=['energy_date'])
+df = pd.read_csv(CSV_FILE, parse_dates=['ts'])
 if 'station_ref_id' in df.columns:
     df = df[df['station_ref_id'] == STATION_ID]
-df = df.sort_values('energy_date')
+df = df.sort_values('ts')
 if df.empty:
     raise ValueError('CSV 中没有指定场站的数据')
+
+# 重命名字段以保持代码兼容性
+df = df.rename(columns={
+    'ts': 'energy_date',
+    'forward_total_active_energy': 'load_discharge_delta'
+})
+
+# 处理可能缺失的字段，设置默认值
+optional_fields = {
+    'temp': 25.0,           # 默认温度25度
+    'humidity': 60.0,       # 默认湿度60%
+    'windSpeed': 5.0,       # 默认风速5m/s
+    'is_work': None,        # 将根据日期计算
+    'is_peak': None,        # 将根据时间计算
+    'code': 999             # 默认代码
+}
+
+for field, default_value in optional_fields.items():
+    if field not in df.columns:
+        if field in ['is_work', 'is_peak']:
+            df[field] = 0  # 临时设置，后面会重新计算
+        else:
+            df[field] = default_value
+        print(f"⚠️  字段 '{field}' 缺失，已设置默认值: {default_value}")
 
 # ---------- enrich（保持与总模型一致） ----------
 cn_holidays = holidays.country_holidays('CN')
@@ -45,10 +70,18 @@ def enrich(d):
     d['month']   = d['energy_date'].dt.month
     d['day']     = d['energy_date'].dt.day
 
-    d['dew_point']  = d['temp'] - (100-d['humidity'])/5
-    d['feels_like'] = d['temp'] + 0.33*d['humidity'] - 4
-    for k in [1,24]:
-        d[f'temp_diff{k}'] = d['temp'].diff(k)
+    # 天气物理特征（如果有天气数据）
+    if 'temp' in d.columns and 'humidity' in d.columns:
+        d['dew_point']  = d['temp'] - (100-d['humidity'])/5
+        d['feels_like'] = d['temp'] + 0.33*d['humidity'] - 4
+        for k in [1,24]:
+            d[f'temp_diff{k}'] = d['temp'].diff(k)
+    else:
+        # 如果没有天气数据，创建虚拟特征
+        d['dew_point'] = 20.0
+        d['feels_like'] = 25.0
+        d['temp_diff1'] = 0.0
+        d['temp_diff24'] = 0.0
 
     d['sin_hour'] = np.sin(2*np.pi*(d['hour']+d['minute']/60)/24)
     d['cos_hour'] = np.cos(2*np.pi*(d['hour']+d['minute']/60)/24)
@@ -80,50 +113,60 @@ enc_cols = joblib.load(f'{ROOT}/enc_cols.pkl')
 dec_cols = joblib.load(f'{ROOT}/dec_cols.pkl')
 sc_enc   = joblib.load(f'{ROOT}/scaler_enc.pkl')
 sc_dec   = joblib.load(f'{ROOT}/scaler_dec.pkl')
-sc_y     = joblib.load(f'{ROOT}/scaler_y.pkl')
+sc_y_energy = joblib.load(f'{ROOT}/scaler_y_energy.pkl')
+sc_y_power  = joblib.load(f'{ROOT}/scaler_y_power.pkl')
 
 # 若缺少列则补 0，确保维度一致
 for col in set(enc_cols + dec_cols):
     if col not in df.columns:
         df[col] = 0
 
-# ---------- 制作滑窗 ----------
+# ---------- 制作滑窗 - 双输出 ----------
 def make_ds(data):
-    Xp, Xf, Ys = [], [], []
+    Xp, Xf, Y_energy, Y_power = [], [], [], []
     enc = sc_enc.transform(data[enc_cols])
     dec = sc_dec.transform(data[dec_cols])
-    y   = sc_y.transform(data[['load_discharge_delta']])
+    y_energy = sc_y_energy.transform(data[['load_discharge_delta']])
+    y_power  = sc_y_power.transform(data[['total_active_power']])
     for i in range(len(data) - PAST_STEPS - FUT_STEPS + 1):
         Xp.append(enc[i:i+PAST_STEPS])
         Xf.append(dec[i+PAST_STEPS:i+PAST_STEPS+FUT_STEPS])
-        Ys.append(y[i+PAST_STEPS:i+PAST_STEPS+FUT_STEPS, 0])
+        Y_energy.append(y_energy[i+PAST_STEPS:i+PAST_STEPS+FUT_STEPS, 0])
+        Y_power.append(y_power[i+PAST_STEPS:i+PAST_STEPS+FUT_STEPS, 0])
     return (np.array(Xp, np.float32),
             np.array(Xf, np.float32),
-            np.array(Ys, np.float32))
+            np.array(Y_energy, np.float32),
+            np.array(Y_power, np.float32))
 
-Xp, Xf, Y = make_ds(df)
+Xp, Xf, Y_energy, Y_power = make_ds(df)
 split = int(.8*len(Xp))
 tr_ds = TensorDataset(torch.from_numpy(Xp[:split]),
                       torch.from_numpy(Xf[:split]),
-                      torch.from_numpy(Y[:split]))
+                      torch.from_numpy(Y_energy[:split]),
+                      torch.from_numpy(Y_power[:split]))
 va_ds = TensorDataset(torch.from_numpy(Xp[split:]),
                       torch.from_numpy(Xf[split:]),
-                      torch.from_numpy(Y[split:]))
+                      torch.from_numpy(Y_energy[split:]),
+                      torch.from_numpy(Y_power[split:]))
 tr_loader = DataLoader(tr_ds, batch_size=BATCH_SIZE, shuffle=True)
 va_loader = DataLoader(va_ds, batch_size=BATCH_SIZE, shuffle=False)
 
-# ---------- 模型结构（与总模型一致） ----------
+# ---------- 模型结构（与总模型一致） - 双输出 ----------
 class EncDec(nn.Module):
     def __init__(self, d_enc, d_dec, hid, drop):
         super().__init__()
         self.enc = nn.LSTM(d_enc, hid, batch_first=True)
         self.dec = nn.LSTM(d_dec, hid, batch_first=True)
         self.dp  = nn.Dropout(drop)
-        self.fc  = nn.Linear(hid, 1)
+        self.fc_energy = nn.Linear(hid, 1)  # 电量预测
+        self.fc_power  = nn.Linear(hid, 1)  # 功率预测
     def forward(self, xe, xd):
         _, (h,c) = self.enc(xe)
         out,_ = self.dec(xd,(h,c))
-        return self.fc(self.dp(out)).squeeze(-1)
+        out_dp = self.dp(out)
+        energy_pred = self.fc_energy(out_dp).squeeze(-1)
+        power_pred = self.fc_power(out_dp).squeeze(-1)
+        return energy_pred, power_pred
 
 # ---------- 加权 L1  ----------
 class WeightedL1(nn.Module):
@@ -155,19 +198,25 @@ best, wait = 1e9, 0
 print(f"\n🚀 开始微调  station={STATION_ID}  samples={len(tr_ds)} / {len(va_ds)}")
 for ep in range(1, EPOCHS+1):
     model.train(); tr=0
-    for xe,xd,yy in tr_loader:
-        xe,xd,yy = xe.to(device), xd.to(device), yy.to(device)
+    for xe,xd,yy_energy,yy_power in tr_loader:
+        xe,xd,yy_energy,yy_power = xe.to(device), xd.to(device), yy_energy.to(device), yy_power.to(device)
         optimizer.zero_grad()
-        loss = criterion(model(xe,xd), yy)
+        pred_energy, pred_power = model(xe,xd)
+        loss_energy = criterion(pred_energy, yy_energy)
+        loss_power = criterion(pred_power, yy_power)
+        loss = loss_energy + loss_power
         loss.backward(); optimizer.step()
         tr += loss.item()
     tr /= len(tr_loader)
 
     model.eval(); va=0
     with torch.no_grad():
-        for xe,xd,yy in va_loader:
-            xe,xd,yy = xe.to(device), xd.to(device), yy.to(device)
-            va += criterion(model(xe,xd), yy).item()
+        for xe,xd,yy_energy,yy_power in va_loader:
+            xe,xd,yy_energy,yy_power = xe.to(device), xd.to(device), yy_energy.to(device), yy_power.to(device)
+            pred_energy, pred_power = model(xe,xd)
+            loss_energy = criterion(pred_energy, yy_energy)
+            loss_power = criterion(pred_power, yy_power)
+            va += (loss_energy + loss_power).item()
     va /= len(va_loader); scheduler.step(va)
 
     log = f'E{ep:03d}  tr {tr:.4f}  va {va:.4f}'
@@ -182,7 +231,7 @@ for ep in range(1, EPOCHS+1):
             log += '  (early stop)'; print(log); break
     print(log)
 
-# ---------- 评估 ----------
+# ---------- 评估 - 双输出 ----------
 def day_mape(t,p):
     res=[]
     for d in range(7):
@@ -196,17 +245,33 @@ model.eval()
 with torch.no_grad():
     xe = torch.from_numpy(Xp[-1:].astype(np.float32)).to(device)
     xd = torch.from_numpy(Xf[-1:].astype(np.float32)).to(device)
-    pred_s = model(xe,xd).cpu().numpy().flatten()
-    pred   = sc_y.inverse_transform(pred_s.reshape(-1,1)).flatten()
-    true   = sc_y.inverse_transform(Y[-1:].reshape(-1,1)).flatten()
+    pred_energy_s, pred_power_s = model(xe,xd)
+    pred_energy_s = pred_energy_s.cpu().numpy().flatten()
+    pred_power_s = pred_power_s.cpu().numpy().flatten()
+    
+    pred_energy = sc_y_energy.inverse_transform(pred_energy_s.reshape(-1,1)).flatten()
+    pred_power = sc_y_power.inverse_transform(pred_power_s.reshape(-1,1)).flatten()
+    
+    true_energy = sc_y_energy.inverse_transform(Y_energy[-1:].reshape(-1,1)).flatten()
+    true_power = sc_y_power.inverse_transform(Y_power[-1:].reshape(-1,1)).flatten()
 
-    true_safe = np.where(true==0,1e-6,true)
-    mape_all  = mean_absolute_percentage_error(true_safe,pred)*100
-    rmse_all  = np.sqrt(mean_squared_error(true,pred))
+    true_energy_safe = np.where(true_energy==0,1e-6,true_energy)
+    true_power_safe = np.where(true_power==0,1e-6,true_power)
+    
+    mape_energy = mean_absolute_percentage_error(true_energy_safe,pred_energy)*100
+    mape_power = mean_absolute_percentage_error(true_power_safe,pred_power)*100
+    
+    rmse_energy = np.sqrt(mean_squared_error(true_energy,pred_energy))
+    rmse_power = np.sqrt(mean_squared_error(true_power,pred_power))
 
-    dm = day_mape(true,pred)
-    dm_str = ' | '.join([f'D{i+1}:{m:.2f}%' for i,m in enumerate(dm)])
+    dm_energy = day_mape(true_energy,pred_energy)
+    dm_power = day_mape(true_power,pred_power)
+    
+    dm_energy_str = ' | '.join([f'D{i+1}:{m:.2f}%' for i,m in enumerate(dm_energy)])
+    dm_power_str = ' | '.join([f'D{i+1}:{m:.2f}%' for i,m in enumerate(dm_power)])
 
-print(f'\n📊 【{STATION_ID}】7-day MAPE={mape_all:.2f}%  RMSE={rmse_all:.2f}')
-print(f'📊 【{STATION_ID}】Day-wise MAPE  {dm_str}')
+print(f'\n📊 【{STATION_ID}】Energy 7-day MAPE={mape_energy:.2f}%  RMSE={rmse_energy:.2f}')
+print(f'📊 【{STATION_ID}】Power  7-day MAPE={mape_power:.2f}%   RMSE={rmse_power:.2f}')
+print(f'📊 【{STATION_ID}】Energy Day-wise MAPE  {dm_energy_str}')
+print(f'📊 【{STATION_ID}】Power  Day-wise MAPE  {dm_power_str}')
 print(f'\n✅ 微调完成  模型已保存至 output_pytorch/model_{STATION_ID}/model_optimized_{STATION_ID}.pth')

@@ -4,25 +4,27 @@ import json
 from datetime import datetime, timedelta
 
 # 场站ID
-station_id = 1716387625733984256  # 改为数值类型，而不是字符串
+station_id = 3205103743359  # 使用数值类型
 
-# 读取loaddata.csv文件
-df = pd.read_csv('loaddata.csv')
+# 读取vpp_meter.csv文件
+df = pd.read_csv('vpp_meter.csv')
 
-# 将energy_date列转换为datetime类型
-df['energy_date'] = pd.to_datetime(df['energy_date'])
+# 将ts列转换为datetime类型
+df['ts'] = pd.to_datetime(df['ts'])
 
-# 筛选出2025-07-10到2025-07-15的数据作为过去5天的数据
-# 注意：API需要连续的480条记录（5天，每15分钟一条）
-start_date = pd.to_datetime('2025-07-10 00:00:00')
-end_date = pd.to_datetime('2025-07-15 23:45:00')
-filtered_df = df[(df['energy_date'] >= start_date) & (df['energy_date'] <= end_date)]
+# 检查必需字段
+required_fields = ['ts', 'total_active_power', 'forward_total_active_energy', 
+                   'backward_total_active_energy', 'label', 'station_ref_id']
+missing_fields = [f for f in required_fields if f not in df.columns]
+if missing_fields:
+    print(f"错误：缺少必需字段: {missing_fields}")
+    exit(1)
 
-# 筛选出station_ref_id为指定场站ID的数据
-filtered_df = filtered_df[filtered_df['station_ref_id'] == station_id]
+# 筛选出指定场站的数据
+filtered_df = df[df['station_ref_id'] == station_id].copy()
 
 # 打印筛选后的数据条数，用于调试
-print(f"筛选后的数据条数: {len(filtered_df)}")
+print(f"场站 {station_id} 的数据条数: {len(filtered_df)}")
 
 # 确保有足够的数据
 if len(filtered_df) == 0:
@@ -30,73 +32,42 @@ if len(filtered_df) == 0:
     exit(1)
 
 # 确保数据按时间排序
-filtered_df = filtered_df.sort_values('energy_date')
+filtered_df = filtered_df.sort_values('ts')
 
-# 确保数据是连续的
-# 检查数据是否有足够的记录
+# 检查数据是否有足够的记录 (至少需要480条用于预测)
 if len(filtered_df) < 480:
     print(f"警告：数据不足480条，只有{len(filtered_df)}条")
     print("错误：API需要连续的480条记录")
     exit(1)
 
-# 确保数据是按15分钟间隔的连续数据
-# 创建一个完整的时间索引（从开始到结束，每15分钟一个点）
-full_date_range = pd.date_range(start=filtered_df['energy_date'].min(), 
-                              end=filtered_df['energy_date'].max(), 
-                              freq='15min')
-
-# 检查是否有缺失的时间点
-missing_dates = set(full_date_range) - set(filtered_df['energy_date'])
-if missing_dates:
-    print(f"警告：数据中有{len(missing_dates)}个缺失的时间点")
-    # 如果有缺失的时间点，我们可以尝试插值或者其他方法填充
-    # 这里简单起见，我们只取最后的连续480条记录
-    # 首先按时间排序
-    filtered_df = filtered_df.sort_values('energy_date')
-    
-    # 找出最长的连续段
-    # 这里简化处理，直接取最后480条
-    past_data = filtered_df.tail(480)
-else:
-    print("数据是连续的，没有缺失的时间点")
-    # 取最后480条记录
-    filtered_df = filtered_df.sort_values('energy_date')
-    past_data = filtered_df.tail(480)
-
-# 检查数据是否足够长，能够计算滞后值和移动平均值
-# 根据API代码，它需要计算load_lag96，这需要至少96个历史点
-# 我们需要确保数据至少有96+480=576个点
-if len(filtered_df) < 576:
-    print(f"警告：数据不足以计算滞后值和移动平均值，需要至少576条，但只有{len(filtered_df)}条")
-    # 这里我们可以尝试生成一些模拟数据来填充
-    # 但为了简单起见，我们直接使用现有数据
-    # 注意：这可能会导致API返回错误
-
-# 为了确保API能够正确计算滞后值和移动平均值，我们需要提供足够长的历史数据
-# 这里我们提供所有可用的数据，而不仅仅是最后480条
-past_data = filtered_df
+# 取最后的数据作为历史数据
+# 为了确保API能够正确计算滞后值和移动平均值，我们提供更多的历史数据
+past_data = filtered_df.tail(min(len(filtered_df), 1000))  # 最多取1000条
 
 # 打印past_data的时间范围
 if not past_data.empty:
-    print(f"过去数据的时间范围: {past_data['energy_date'].min()} 到 {past_data['energy_date'].max()}")
+    print(f"过去数据的时间范围: {past_data['ts'].min()} 到 {past_data['ts'].max()}")
     print(f"过去数据的条数: {len(past_data)}")
 
 # 构建past_data部分的请求数据
 past_data_list = []
 for _, row in past_data.iterrows():
     past_item = {
-        "energy_date": row['energy_date'].strftime("%Y-%m-%dT%H:%M:%S"),
-        "load_discharge_delta": float(row['load_discharge_delta']),
-        "temp": float(row['temp']),
-        "humidity": float(row['humidity']),
-        "windSpeed": float(row['windSpeed']),
-        "is_work": int(row['is_work']),
-        "is_peak": int(row['is_peak'])
+        "ts": row['ts'].strftime("%Y-%m-%dT%H:%M:%S"),
+        "forward_total_active_energy": float(row['forward_total_active_energy']),
+        "total_active_power": float(row.get('total_active_power', 0)),
+        # 处理可能缺失的字段
+        "temp": float(row.get('temp', 25.0)),
+        "humidity": float(row.get('humidity', 60.0)),
+        "windSpeed": float(row.get('windSpeed', 5.0)),
+        "is_work": int(row.get('is_work', 1)),
+        "is_peak": int(row.get('is_peak', 0)),
+        "code": int(row.get('code', 999))
     }
     past_data_list.append(past_item)
 
 # 获取最后一条数据的时间
-last_time = past_data['energy_date'].iloc[-1]
+last_time = past_data['ts'].iloc[-1]
 
 # 构建future_external部分的请求数据（未来7天，672条记录）
 future_data_list = []
@@ -104,15 +75,10 @@ for i in range(1, 673):
     # 每15分钟一条记录
     future_time = last_time + timedelta(minutes=15 * i)
     
-    # 生成模拟的天气数据（这里简单地使用一些固定值，实际应用中可能需要更复杂的模型）
-    # 温度在25-35度之间波动
+    # 生成模拟的天气数据
     hour = future_time.hour
     temp = 25 + (hour % 12) * 0.8 if hour < 12 else 35 - (hour % 12) * 0.8
-    
-    # 湿度在50-90%之间波动，与温度成反比
     humidity = 90 - (temp - 25) * 2
-    
-    # 风速在0-15之间波动
     windSpeed = (hour % 16)
     
     # 工作日判断（周一到周五为工作日）
@@ -122,18 +88,19 @@ for i in range(1, 673):
     is_peak = 1 if 8 <= hour < 18 else 0
     
     future_item = {
-        "energy_date": future_time.strftime("%Y-%m-%dT%H:%M:%S"),
+        "ts": future_time.strftime("%Y-%m-%dT%H:%M:%S"),
         "temp": float(temp),
         "humidity": float(humidity),
         "windSpeed": float(windSpeed),
         "is_work": is_work,
-        "is_peak": is_peak
+        "is_peak": is_peak,
+        "code": 999
     }
     future_data_list.append(future_item)
 
 # 构建完整的请求数据
 request_data = {
-    "station_id": str(station_id),  # 确保API请求中是字符串格式
+    "station_id": str(station_id),
     "past_data": past_data_list,
     "future_external": future_data_list
 }
@@ -148,6 +115,7 @@ headers = {"Content-Type": "application/json"}
 
 try:
     # 发送POST请求
+    print("正在发送请求到API...")
     response = requests.post(url, json=request_data, headers=headers)
     
     # 检查响应状态码
@@ -155,15 +123,41 @@ try:
         # 解析JSON响应
         result = response.json()
         
-        # 打印响应结果
-        print("\n预测结果:")
-        print(json.dumps(result, indent=2, ensure_ascii=False))
+        # 打印响应结果摘要
+        print("\n✅ 预测成功!")
+        print(f"场站ID: {result['station_id']}")
+        print(f"使用模型: {result['model_used']}")
+        print(f"预测结果条数: {len(result['predictions'])}")
         
-        # 打印预测结果的条数
-        print(f"\n预测结果条数: {len(result['predictions'])}")
+        # 打印前几条预测结果作为示例
+        print("\n📊 预测结果示例 (前5条):")
+        for i, pred in enumerate(result['predictions'][:5]):
+            print(f"  {i+1}. 时间: {pred['ts']}")
+            print(f"     用电量预测: {pred['forward_total_active_energy_pred']:.2f}")
+            print(f"     功率预测: {pred['total_active_power_pred']:.2f}")
+        
+        # 保存完整结果到文件
+        with open('prediction_results.json', 'w', encoding='utf-8') as f:
+            json.dump(result, f, indent=2, ensure_ascii=False)
+        print("\n💾 完整预测结果已保存到 prediction_results.json")
+        
+        # 统计信息
+        predictions = result['predictions']
+        energy_preds = [p['forward_total_active_energy_pred'] for p in predictions]
+        power_preds = [p['total_active_power_pred'] for p in predictions]
+        
+        print(f"\n📈 预测统计:")
+        print(f"用电量预测范围: {min(energy_preds):.2f} ~ {max(energy_preds):.2f}")
+        print(f"功率预测范围: {min(power_preds):.2f} ~ {max(power_preds):.2f}")
+        print(f"平均用电量预测: {sum(energy_preds)/len(energy_preds):.2f}")
+        print(f"平均功率预测: {sum(power_preds)/len(power_preds):.2f}")
+        
     else:
-        print(f"请求失败，状态码: {response.status_code}")
+        print(f"❌ 请求失败，状态码: {response.status_code}")
         print(f"错误信息: {response.text}")
         
+except requests.exceptions.ConnectionError:
+    print("❌ 连接错误：无法连接到API服务器")
+    print("请确保API服务器正在运行 (python api_encdec_7d.py)")
 except Exception as e:
-    print(f"发生错误: {str(e)}")
+    print(f"❌ 发生错误: {str(e)}")

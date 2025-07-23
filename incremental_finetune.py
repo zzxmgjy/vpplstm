@@ -1,6 +1,7 @@
 # incremental_finetune.py
 # =========================================================
 # 增量微调单站模型  (与 WeightedL1 + prev_load 逻辑一致)
+# Updated for vpp_meter.csv with dual outputs (energy + power)
 # =========================================================
 import os, warnings, joblib, holidays, pandas as pd, numpy as np
 from sklearn.metrics import mean_absolute_percentage_error
@@ -11,7 +12,7 @@ warnings.filterwarnings("ignore")
 
 # ---------------- CONFIG ----------------
 STATION_ID  = 3205103743359      # ← 目标场站
-NEW_CSV     = 'loaddata.csv'     # ← 新增数据 (近 15 天 或任意周期)
+NEW_CSV     = 'vpp_meter.csv'   # ← 新增数据使用 vpp_meter.csv
 EPOCHS      = 15
 BATCH_SIZE  = 128
 LR_INCR     = 2e-4               # 增量学习率
@@ -31,17 +32,43 @@ def make_is_peak(ts):
 
 # ---------- 读取尾巴缓存 (上次 PAST+FUT) ----------
 TAIL_PATH = f'{MODEL_DIR}/tail_cache_{STATION_ID}.csv'
-old_tail  = pd.read_csv(TAIL_PATH, parse_dates=['energy_date']) if os.path.exists(TAIL_PATH) else pd.DataFrame()
+old_tail  = pd.read_csv(TAIL_PATH, parse_dates=['ts']) if os.path.exists(TAIL_PATH) else pd.DataFrame()
+if not old_tail.empty and 'ts' in old_tail.columns:
+    old_tail = old_tail.rename(columns={'ts': 'energy_date'})
 
 # ---------- 读取新增 CSV ----------
-df_new = pd.read_csv(NEW_CSV, parse_dates=['energy_date'])
+df_new = pd.read_csv(NEW_CSV, parse_dates=['ts'])
 if 'station_ref_id' in df_new.columns:
     df_new = df_new[df_new['station_ref_id'] == STATION_ID]
 if df_new.empty:
     raise ValueError('新增 CSV 中无该场站数据')
 
+# 重命名字段以保持代码兼容性
+df_new = df_new.rename(columns={
+    'ts': 'energy_date',
+    'forward_total_active_energy': 'load_discharge_delta'
+})
+
 # 合并、按时间排序
 df = pd.concat([old_tail, df_new], ignore_index=True).sort_values('energy_date').reset_index(drop=True)
+
+# 处理可能缺失的字段，设置默认值
+optional_fields = {
+    'temp': 25.0,           # 默认温度25度
+    'humidity': 60.0,       # 默认湿度60%
+    'windSpeed': 5.0,       # 默认风速5m/s
+    'is_work': None,        # 将根据日期计算
+    'is_peak': None,        # 将根据时间计算
+    'code': 999             # 默认代码
+}
+
+for field, default_value in optional_fields.items():
+    if field not in df.columns:
+        if field in ['is_work', 'is_peak']:
+            df[field] = 0  # 临时设置，后面会重新计算
+        else:
+            df[field] = default_value
+        print(f"⚠️  字段 '{field}' 缺失，已设置默认值: {default_value}")
 
 # ---------- enrich (必须与总模型一致) ----------
 cn_holidays = holidays.country_holidays('CN')
@@ -52,10 +79,18 @@ def enrich(d):
     d['month']   = d['energy_date'].dt.month
     d['day']     = d['energy_date'].dt.day
 
-    d['dew_point']  = d['temp'] - (100-d['humidity'])/5
-    d['feels_like'] = d['temp'] + 0.33*d['humidity'] - 4
-    for k in [1,24]:
-        d[f'temp_diff{k}'] = d['temp'].diff(k)
+    # 天气物理特征（如果有天气数据）
+    if 'temp' in d.columns and 'humidity' in d.columns:
+        d['dew_point']  = d['temp'] - (100-d['humidity'])/5
+        d['feels_like'] = d['temp'] + 0.33*d['humidity'] - 4
+        for k in [1,24]:
+            d[f'temp_diff{k}'] = d['temp'].diff(k)
+    else:
+        # 如果没有天气数据，创建虚拟特征
+        d['dew_point'] = 20.0
+        d['feels_like'] = 25.0
+        d['temp_diff1'] = 0.0
+        d['temp_diff24'] = 0.0
 
     d['sin_hour'] = np.sin(2*np.pi*(d['hour']+d['minute']/60)/24)
     d['cos_hour'] = np.cos(2*np.pi*(d['hour']+d['minute']/60)/24)
@@ -83,44 +118,54 @@ enc_cols = joblib.load(f'{ROOT}/enc_cols.pkl')
 dec_cols = joblib.load(f'{ROOT}/dec_cols.pkl')
 sc_enc   = joblib.load(f'{ROOT}/scaler_enc.pkl')
 sc_dec   = joblib.load(f'{ROOT}/scaler_dec.pkl')
-sc_y     = joblib.load(f'{ROOT}/scaler_y.pkl')
+sc_y_energy = joblib.load(f'{ROOT}/scaler_y_energy.pkl')
+sc_y_power  = joblib.load(f'{ROOT}/scaler_y_power.pkl')
 
 # 补全缺失列
 for col in set(enc_cols + dec_cols):
     if col not in df.columns:
         df[col] = 0
 
-# ---------- 滑窗 ----------
+# ---------- 滑窗 - 双输出 ----------
 def make_ds(data):
-    Xp,Xf,Y = [],[],[]
+    Xp,Xf,Y_energy,Y_power = [],[],[],[]
     enc = sc_enc.transform(data[enc_cols])
     dec = sc_dec.transform(data[dec_cols])
-    y   = sc_y.transform(data[['load_discharge_delta']])
+    y_energy = sc_y_energy.transform(data[['load_discharge_delta']])
+    y_power  = sc_y_power.transform(data[['total_active_power']])
     for i in range(len(data)-PAST-FUT+1):
         Xp.append(enc[i:i+PAST])
         Xf.append(dec[i+PAST:i+PAST+FUT])
-        Y.append(y[i+PAST:i+PAST+FUT,0])
-    return np.array(Xp,np.float32), np.array(Xf,np.float32), np.array(Y,np.float32)
+        Y_energy.append(y_energy[i+PAST:i+PAST+FUT,0])
+        Y_power.append(y_power[i+PAST:i+PAST+FUT,0])
+    return (np.array(Xp,np.float32), np.array(Xf,np.float32), 
+            np.array(Y_energy,np.float32), np.array(Y_power,np.float32))
 
-Xp,Xf,Y = make_ds(df)
+Xp,Xf,Y_energy,Y_power = make_ds(df)
 if len(Xp)==0:
     raise ValueError('增量数据不足以形成滑窗样本')
 loader = DataLoader(TensorDataset(torch.from_numpy(Xp),
                                   torch.from_numpy(Xf),
-                                  torch.from_numpy(Y)),
+                                  torch.from_numpy(Y_energy),
+                                  torch.from_numpy(Y_power)),
                     batch_size=BATCH_SIZE, shuffle=True)
 
-# ---------- 模型 ----------
+# ---------- 模型 - 双输出 ----------
 class EncDec(nn.Module):
     def __init__(self,d_enc,d_dec,hid,drop):
         super().__init__()
         self.enc = nn.LSTM(d_enc,hid,batch_first=True)
         self.dec = nn.LSTM(d_dec,hid,batch_first=True)
-        self.dp  = nn.Dropout(drop); self.fc = nn.Linear(hid,1)
+        self.dp  = nn.Dropout(drop)
+        self.fc_energy = nn.Linear(hid,1)  # 电量预测
+        self.fc_power  = nn.Linear(hid,1)  # 功率预测
     def forward(self,xe,xd):
         _,(h,c)=self.enc(xe)
         out,_ = self.dec(xd,(h,c))
-        return self.fc(self.dp(out)).squeeze(-1)
+        out_dp = self.dp(out)
+        energy_pred = self.fc_energy(out_dp).squeeze(-1)
+        power_pred = self.fc_power(out_dp).squeeze(-1)
+        return energy_pred, power_pred
 
 # --- Weighted L1 (与总模型保持一致) ---
 class WeightedL1(nn.Module):
@@ -159,10 +204,13 @@ best=float('inf'); wait=0
 print(f"🚀 增量训练样本 {len(loader.dataset)}   batch {BATCH_SIZE}")
 for ep in range(1,EPOCHS+1):
     model.train(); ep_loss=0
-    for xe,xd,yy in loader:
-        xe,xd,yy = xe.to(DEVICE),xd.to(DEVICE),yy.to(DEVICE)
+    for xe,xd,yy_energy,yy_power in loader:
+        xe,xd,yy_energy,yy_power = xe.to(DEVICE),xd.to(DEVICE),yy_energy.to(DEVICE),yy_power.to(DEVICE)
         optimizer.zero_grad()
-        loss = criterion(model(xe,xd),yy)
+        pred_energy, pred_power = model(xe,xd)
+        loss_energy = criterion(pred_energy,yy_energy)
+        loss_power = criterion(pred_power,yy_power)
+        loss = loss_energy + loss_power
         loss.backward(); optimizer.step()
         ep_loss += loss.item()
     ep_loss /= len(loader); scheduler.step(ep_loss)
@@ -178,7 +226,7 @@ for ep in range(1,EPOCHS+1):
             log+=' (early stop)'; print(log); break
     print(log)
 
-# ---------- 简易评估 ----------
+# ---------- 简易评估 - 双输出 ----------
 def day_mape(t,p):
     res=[]
     for d in range(7):
@@ -191,16 +239,32 @@ model.eval()
 with torch.no_grad():
     xe=torch.from_numpy(Xp[-1:].astype(np.float32)).to(DEVICE)
     xd=torch.from_numpy(Xf[-1:].astype(np.float32)).to(DEVICE)
-    pred_s=model(xe,xd).cpu().numpy().flatten()
-    pred  = sc_y.inverse_transform(pred_s.reshape(-1,1)).flatten()
-    true  = sc_y.inverse_transform(Y[-1:].reshape(-1,1)).flatten()
+    pred_energy_s, pred_power_s = model(xe,xd)
+    pred_energy_s = pred_energy_s.cpu().numpy().flatten()
+    pred_power_s = pred_power_s.cpu().numpy().flatten()
+    
+    pred_energy = sc_y_energy.inverse_transform(pred_energy_s.reshape(-1,1)).flatten()
+    pred_power = sc_y_power.inverse_transform(pred_power_s.reshape(-1,1)).flatten()
+    
+    true_energy = sc_y_energy.inverse_transform(Y_energy[-1:].reshape(-1,1)).flatten()
+    true_power = sc_y_power.inverse_transform(Y_power[-1:].reshape(-1,1)).flatten()
 
-    overall = mean_absolute_percentage_error(
-        np.where(true==0,1e-6,true), pred)*100
-    dm = day_mape(true,pred)
-print(f'\n📊 7-day MAPE {overall:.2f}%  | '+
-      '  '.join([f'D{i+1}:{m:.2f}%' for i,m in enumerate(dm)]))
+    overall_energy = mean_absolute_percentage_error(
+        np.where(true_energy==0,1e-6,true_energy), pred_energy)*100
+    overall_power = mean_absolute_percentage_error(
+        np.where(true_power==0,1e-6,true_power), pred_power)*100
+    
+    dm_energy = day_mape(true_energy,pred_energy)
+    dm_power = day_mape(true_power,pred_power)
+
+print(f'\n📊 Energy 7-day MAPE {overall_energy:.2f}%  | '+
+      '  '.join([f'D{i+1}:{m:.2f}%' for i,m in enumerate(dm_energy)]))
+print(f'📊 Power  7-day MAPE {overall_power:.2f}%   | '+
+      '  '.join([f'D{i+1}:{m:.2f}%' for i,m in enumerate(dm_power)]))
 
 # ---------- 更新尾巴缓存 ----------
-df.tail(PAST+FUT).to_csv(TAIL_PATH,index=False)
+# 保存时使用原始字段名 ts
+df_cache = df.tail(PAST+FUT).copy()
+df_cache = df_cache.rename(columns={'energy_date': 'ts'})
+df_cache.to_csv(TAIL_PATH,index=False)
 print("\n✅ 增量微调完成，权重 & 尾巴缓存已更新")
