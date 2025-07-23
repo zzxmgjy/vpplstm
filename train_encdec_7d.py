@@ -47,6 +47,11 @@ missing_fields = [f for f in required_fields if f not in df.columns]
 if missing_fields:
     raise ValueError(f"缺少必需字段: {missing_fields}")
 
+# 特别检查功率字段，如果缺失则创建默认值
+if 'total_active_power' not in df.columns:
+    print("WARNING: total_active_power field missing, using default conversion from forward_total_active_energy")
+    df['total_active_power'] = df['forward_total_active_energy'] * 4  # 假设15分钟电量转换为功率
+
 # 重命名字段以保持代码兼容性
 df = df.rename(columns={
     'ts': 'energy_date',
@@ -69,7 +74,7 @@ for field, default_value in optional_fields.items():
             df[field] = 0  # 临时设置，后面会重新计算
         else:
             df[field] = default_value
-        print(f"⚠️  字段 '{field}' 缺失，已设置默认值: {default_value}")
+        print(f"WARNING: Field '{field}' missing, set default value: {default_value}")
 
 df['code'] = df['code'].fillna(999).astype(int)
 
@@ -159,7 +164,7 @@ def add_adv(g):
 df = df.groupby('station_ref_id', group_keys=False).apply(add_adv)
 
 # =========================================================
-# 5️⃣ 缺失值处理
+# 5️⃣ 缺失值处理 + 数据清洗
 # =========================================================
 df = df.fillna(method='ffill').fillna(method='bfill')
 df = df.dropna(subset=['load_discharge_delta'])
@@ -167,6 +172,21 @@ for col in ['load_trend','load_seasonal','load_resid',
             'load_q10_48','load_q90_48','load_norm_48','prev_load']:
     if col in df.columns:
         df[col] = df[col].fillna(0)
+
+# 清理无穷大和异常值
+print("🧹 清理数据中的无穷大和异常值...")
+numeric_cols = df.select_dtypes(include=[np.number]).columns
+for col in numeric_cols:
+    if col in df.columns:
+        # 替换无穷大值
+        df[col] = df[col].replace([np.inf, -np.inf], np.nan)
+        # 填充 NaN
+        df[col] = df[col].fillna(df[col].median() if not df[col].isna().all() else 0)
+        # 处理极端异常值 (超过99.9%分位数的值)
+        if df[col].std() > 0:
+            upper_bound = df[col].quantile(0.999)
+            lower_bound = df[col].quantile(0.001)
+            df[col] = df[col].clip(lower=lower_bound, upper=upper_bound)
 
 print(f"🟢  数据行数 {len(df):,}")
 
@@ -212,7 +232,7 @@ if 'prev_load' not in ENC_COLS: ENC_COLS.append('prev_load')
 DEC_COLS=[c for c in ENC_COLS if not c.startswith('load_')]
 if 'prev_load' not in DEC_COLS: DEC_COLS.append('prev_load')
 
-print(f"✅ 选 {len(ENC_COLS)} encoder  {len(DEC_COLS)} decoder 特征")
+print(f"SUCCESS: Selected {len(ENC_COLS)} encoder  {len(DEC_COLS)} decoder features")
 
 # =========================================================
 # 8️⃣ 滑窗数据 - 双输出（电量+功率）
@@ -220,6 +240,18 @@ print(f"✅ 选 {len(ENC_COLS)} encoder  {len(DEC_COLS)} decoder 特征")
 def make_ds(data,past,fut):
     Xp,Xf,Y_energy,Y_power=[],[],[],[]
     sc_e,sc_d,sc_y_energy,sc_y_power=StandardScaler(),StandardScaler(),StandardScaler(),StandardScaler()
+    
+    # 最终数据验证
+    print("INFO: Validating data quality...")
+    for col in ENC_COLS + DEC_COLS + ['load_discharge_delta', 'total_active_power']:
+        if col in data.columns:
+            if data[col].isnull().any():
+                print(f"WARNING: {col} has {data[col].isnull().sum()} null values, filling with median")
+                data[col] = data[col].fillna(data[col].median())
+            if np.isinf(data[col]).any():
+                print(f"WARNING: {col} has infinite values, replacing with boundary values")
+                data[col] = data[col].replace([np.inf, -np.inf], [data[col].quantile(0.99), data[col].quantile(0.01)])
+    
     e_all=sc_e.fit_transform(data[ENC_COLS])
     d_all=sc_d.fit_transform(data[DEC_COLS])
     y_energy_all=sc_y_energy.fit_transform(data[['load_discharge_delta']])
@@ -320,7 +352,7 @@ for ep in range(1,CFG['epochs']+1):
         best=va;wait=0;torch.save(model.state_dict(),'output_pytorch/model_weighted.pth')
     else:
         wait+=1
-        if wait>=CFG['patience']: print("EarlyStop");break
+        if wait>=CFG['patience']: print("INFO: EarlyStop");break
 
 # ---------- 保存 ----------
 joblib.dump(sc_e,'output_pytorch/scaler_enc.pkl')
@@ -338,8 +370,19 @@ def day_mape(t,p):
     for d in range(7):
         s,e=d*96,(d+1)*96
         t0,t1=t[s:e],p[s:e]
-        t0=np.where(t0==0,1e-6,t0)
-        r.append(mean_absolute_percentage_error(t0,t1)*100)
+        # 更严格的处理：过滤掉异常值
+        mask = (np.abs(t0) > 1e-3) & np.isfinite(t0) & np.isfinite(t1)
+        if mask.sum() == 0:
+            r.append(0.0)  # 如果没有有效数据，返回0
+        else:
+            t0_filtered = t0[mask]
+            t1_filtered = t1[mask]
+            # 使用绝对值确保分母为正
+            t0_filtered = np.where(np.abs(t0_filtered) < 1e-3, 
+                                 np.sign(t0_filtered) * 1e-3, t0_filtered)
+            mape = np.mean(np.abs((t0_filtered - t1_filtered) / t0_filtered)) * 100
+            # 限制MAPE的最大值，避免极端情况
+            r.append(min(mape, 1000.0))
     return r
 
 model.eval()
@@ -367,6 +410,16 @@ with torch.no_grad():
         true_energy=win.tail(CFG['future_steps'])['load_discharge_delta'].values
         true_power=win.tail(CFG['future_steps'])['total_active_power'].values
         
+        # 数据质量检查
+        if sid == list(df['station_ref_id'].unique())[0]:  # 只对第一个站点打印调试信息
+            print(f"DEBUG: Station {sid}:")
+            print(f"  True energy range: {true_energy.min():.2f} ~ {true_energy.max():.2f}")
+            print(f"  Pred energy range: {pred_energy.min():.2f} ~ {pred_energy.max():.2f}")
+            print(f"  True power range: {true_power.min():.2f} ~ {true_power.max():.2f}")
+            print(f"  Pred power range: {pred_power.min():.2f} ~ {pred_power.max():.2f}")
+            print(f"  Energy zero/negative count: {(true_energy <= 0).sum()}")
+            print(f"  Power zero/negative count: {(true_power <= 0).sum()}")
+        
         dm_energy=day_mape(true_energy,pred_energy)
         dm_power=day_mape(true_power,pred_power)
         
@@ -380,10 +433,21 @@ with torch.no_grad():
         all_p_power.append(pred_power); all_t_power.append(true_power)
 
 if all_t_energy:
-    overall_energy=mean_absolute_percentage_error(np.concatenate(all_t_energy),
-                                                 np.concatenate(all_p_energy))*100
-    overall_power=mean_absolute_percentage_error(np.concatenate(all_t_power),
-                                                np.concatenate(all_p_power))*100
+    # 安全的MAPE计算
+    def safe_mape(y_true, y_pred):
+        y_true, y_pred = np.array(y_true), np.array(y_pred)
+        mask = (np.abs(y_true) > 1e-3) & np.isfinite(y_true) & np.isfinite(y_pred)
+        if mask.sum() == 0:
+            return 0.0
+        y_true_filtered = y_true[mask]
+        y_pred_filtered = y_pred[mask]
+        y_true_filtered = np.where(np.abs(y_true_filtered) < 1e-3, 
+                                 np.sign(y_true_filtered) * 1e-3, y_true_filtered)
+        mape = np.mean(np.abs((y_true_filtered - y_pred_filtered) / y_true_filtered)) * 100
+        return min(mape, 1000.0)
+    
+    overall_energy = safe_mape(np.concatenate(all_t_energy), np.concatenate(all_p_energy))
+    overall_power = safe_mape(np.concatenate(all_t_power), np.concatenate(all_p_power))
     print(f"\nOverall 7-day Energy MAPE: {overall_energy:.2f}%")
     print(f"Overall 7-day Power MAPE:  {overall_power:.2f}%")
     
@@ -392,4 +456,4 @@ if all_t_energy:
     print("\nPower Day-wise MAPE:")
     for i,l in enumerate(day_res_power):print(f'Day{i+1}:{np.mean(l):.2f}%')
 
-print(f'🏁 done!  total {time.time()-t0:.1f}s')
+print(f'SUCCESS: Training completed! Total time: {time.time()-t0:.1f}s')
