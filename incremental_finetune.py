@@ -1,412 +1,421 @@
-# incremental_finetune.py
 # =========================================================
-# 增量微调单站模型  (与 WeightedL1 + prev_load 逻辑一致)
-# Updated for vpp_meter.csv with dual outputs (energy + power)
+#  Incremental Fine-tuning for Single Station Model
+#  Fine-tunes existing model with new incremental data
 # =========================================================
-import os, warnings, joblib, holidays, pandas as pd, numpy as np
-from sklearn.metrics import mean_absolute_percentage_error
+import os, warnings, gc, time
+import pandas as pd, numpy as np
+from sklearn.preprocessing import StandardScaler
 import torch, torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+import joblib
+import argparse
+import holidays
+from statsmodels.tsa.seasonal import STL
+
 warnings.filterwarnings("ignore")
 
-# ---------------- CONFIG ----------------
-STATION_ID  = 1851144626925211648      # ← 目标场站
-NEW_CSV     = 'vpp_meter.csv'   # ← 新增数据使用 vpp_meter.csv
-EPOCHS      = 30                 # 增加训练轮数
-BATCH_SIZE  = 64                 # 减小批次大小，提高训练稳定性
-LR_INCR     = 1e-4               # 降低学习率，更精细调整
-# ---------------------------------------
+# Fine-tuning configuration
+FINETUNE_CFG = dict(
+    batch_size   = 32,            # Smaller batch for fine-tuning
+    epochs       = 50,            # Fewer epochs for fine-tuning
+    patience     = 15,            # Early stopping patience
+    lr           = 1e-5,          # Lower learning rate for fine-tuning
+    power_weight = 1.0,           
+    not_use_power_weight = 0.8    
+)
 
-ROOT        = 'output_pytorch'
-MODEL_DIR   = f'{ROOT}/model_{STATION_ID}'
-os.makedirs(MODEL_DIR, exist_ok=True)
+class EncDecPowerModel(nn.Module):
+    """Same model architecture as in training script"""
+    def __init__(self, d_enc, d_dec, hid, drop, num_layers=2):
+        super().__init__()
+        self.enc = nn.LSTM(d_enc, hid, num_layers=num_layers, batch_first=True, 
+                          dropout=drop if num_layers>1 else 0)
+        self.dec = nn.LSTM(d_dec, hid, num_layers=num_layers, batch_first=True, 
+                          dropout=drop if num_layers>1 else 0)
+        self.dp = nn.Dropout(drop)
+        
+        self.fc_mid = nn.Sequential(
+            nn.Linear(hid, hid//2),
+            nn.ReLU(),
+            nn.Dropout(drop),
+            nn.Linear(hid//2, hid//4),
+            nn.ReLU(),
+            nn.Dropout(drop)
+        )
+        
+        self.fc_power = nn.Linear(hid//4, 1)           
+        self.fc_not_use_power = nn.Linear(hid//4, 1)   
+        
+    def forward(self, xe, xd):
+        _, (h, c) = self.enc(xe)
+        out, _ = self.dec(xd, (h, c))
+        out_dp = self.dp(out)
+        out_mid = self.fc_mid(out_dp)
+        power_pred = self.fc_power(out_mid).squeeze(-1)
+        not_use_power_pred = self.fc_not_use_power(out_mid).squeeze(-1)
+        return power_pred, not_use_power_pred
 
-PAST, FUT   = 96*5, 96*7
-DEVICE      = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+class WeightedL1Loss(nn.Module):
+    """Same loss function as in training script"""
+    def __init__(self, fut, device):
+        super().__init__()
+        w = np.concatenate([
+            np.ones(96*2),           # Day1-2
+            np.ones(96)*1.3,         # Day3
+            np.ones(96)*1.5,         # Day4
+            np.ones(96*3)*1.2        # Day5-7
+        ])
+        self.register_buffer('w', torch.tensor(w, dtype=torch.float32, device=device))
+        
+    def forward(self, pred, target):
+        return torch.mean(self.w * torch.abs(pred - target))
 
-# ---------- is_peak ----------
 def make_is_peak(ts):
-    h,mi = ts.dt.hour, ts.dt.minute
-    return (((h>8)|((h==8)&(mi>=30))) & ((h<17)|((h==17)&(mi<=30)))).astype(int)
+    h, mi = ts.dt.hour, ts.dt.minute
+    return ((h>8)|((h==8)&(mi>=30))) & ((h<17)|((h==17)&(mi<=30)))
 
-# ---------- 读取尾巴缓存 (上次 PAST+FUT) ----------
-TAIL_PATH = f'{MODEL_DIR}/tail_cache_{STATION_ID}.csv'
-old_tail  = pd.read_csv(TAIL_PATH, parse_dates=['ts']) if os.path.exists(TAIL_PATH) else pd.DataFrame()
-if not old_tail.empty and 'ts' in old_tail.columns:
-    old_tail = old_tail.rename(columns={'ts': 'energy_date'})
-
-# ---------- 读取新增 CSV ----------
-df_new = pd.read_csv(NEW_CSV, parse_dates=['ts'])
-if 'station_ref_id' in df_new.columns:
-    df_new = df_new[df_new['station_ref_id'] == STATION_ID]
-if df_new.empty:
-    raise ValueError('新增 CSV 中无该场站数据')
-
-# 重命名字段以保持代码兼容性
-df_new = df_new.rename(columns={
-    'ts': 'energy_date',
-    'forward_total_active_energy': 'load_discharge_delta'
-})
-
-# 合并、按时间排序
-df = pd.concat([old_tail, df_new], ignore_index=True).sort_values('energy_date').reset_index(drop=True)
-
-# 处理可能缺失的字段，设置默认值
-optional_fields = {
-    'temp': 25.0,           # 默认温度25度
-    'humidity': 60.0,       # 默认湿度60%
-    'windSpeed': 5.0,       # 默认风速5m/s
-    'is_work': None,        # 将根据日期计算
-    'is_peak': None,        # 将根据时间计算
-    'code': 999             # 默认代码
-}
-
-for field, default_value in optional_fields.items():
-    if field not in df.columns:
-        if field in ['is_work', 'is_peak']:
-            df[field] = 0  # 临时设置，后面会重新计算
-        else:
-            df[field] = default_value
-        print(f"WARNING: Field '{field}' missing, set default value: {default_value}")
-
-# ---------- enrich (必须与总模型一致) ----------
-cn_holidays = holidays.country_holidays('CN')
-def enrich(d):
+def enrich_features(d: pd.DataFrame):
+    """Same feature engineering as in training script"""
+    cn_holidays = holidays.country_holidays('CN')
+    
     d['hour']    = d['energy_date'].dt.hour
     d['minute']  = d['energy_date'].dt.minute
     d['weekday'] = d['energy_date'].dt.weekday
     d['month']   = d['energy_date'].dt.month
     d['day']     = d['energy_date'].dt.day
-
-    # 天气物理特征（如果有天气数据）
+    
+    # Weather features
     if 'temp' in d.columns and 'humidity' in d.columns:
         d['dew_point']  = d['temp'] - (100-d['humidity'])/5
         d['feels_like'] = d['temp'] + 0.33*d['humidity'] - 4
         for k in [1,24]:
             d[f'temp_diff{k}'] = d['temp'].diff(k)
     else:
-        # 如果没有天气数据，创建虚拟特征
         d['dew_point'] = 20.0
         d['feels_like'] = 25.0
         d['temp_diff1'] = 0.0
         d['temp_diff24'] = 0.0
-
+    
+    # Cyclical features
     d['sin_hour'] = np.sin(2*np.pi*(d['hour']+d['minute']/60)/24)
     d['cos_hour'] = np.cos(2*np.pi*(d['hour']+d['minute']/60)/24)
     d['sin_wday'] = np.sin(2*np.pi*d['weekday']/7)
     d['cos_wday'] = np.cos(2*np.pi*d['weekday']/7)
-
+    
+    # Calendar features
     d['is_holiday'] = d['energy_date'].isin(cn_holidays).astype(int)
     d['is_work']    = ((d['weekday']<5)&(~d['energy_date'].isin(cn_holidays))).astype(int)
     d['is_peak']    = make_is_peak(d['energy_date']).astype(int)
+    
+    for lag in [1,2,3]:
+        d[f'before_holiday_{lag}'] = d['energy_date'].shift(-lag).isin(cn_holidays).astype(int)
+        d[f'after_holiday_{lag}']  = d['energy_date'].shift(lag ).isin(cn_holidays).astype(int)
+    
+    d['is_month_begin'] = (d['day']<=3).astype(int)
+    d['is_month_end']   = d['energy_date'].dt.is_month_end.astype(int)
     return d
-df = enrich(df)
 
-# ---------- 增强特征工程 ----------
-# 基础滞后特征
-for lag in [1,2,4,8,12,24,48,96,192,288]:  # 增加更长期滞后
-    df[f'load_lag{lag}'] = df['load_discharge_delta'].shift(lag)
-
-# 滚动统计特征
-for w in [4,8,12,24,48,96,192]:  # 增加更长窗口
-    df[f'load_ma{w}']  = df['load_discharge_delta'].rolling(w,1).mean()
-    df[f'load_std{w}'] = df['load_discharge_delta'].rolling(w,1).std()
-    df[f'load_min{w}'] = df['load_discharge_delta'].rolling(w,1).min()
-    df[f'load_max{w}'] = df['load_discharge_delta'].rolling(w,1).max()
-    df[f'load_q25{w}'] = df['load_discharge_delta'].rolling(w,1).quantile(0.25)
-    df[f'load_q75{w}'] = df['load_discharge_delta'].rolling(w,1).quantile(0.75)
-
-# 周期性特征增强
-df['load_lag_week'] = df['load_discharge_delta'].shift(96*7)  # 同一周期
-df['load_lag_day'] = df['load_discharge_delta'].shift(96)     # 同一时刻昨天
-df['load_ma_week'] = df['load_discharge_delta'].rolling(96*7,1).mean()
-
-# 差分特征
-df['load_diff1'] = df['load_discharge_delta'].diff(1)
-df['load_diff24'] = df['load_discharge_delta'].diff(24)
-df['load_diff96'] = df['load_discharge_delta'].diff(96)
-
-# 比率特征
-df['load_ratio_ma24'] = df['load_discharge_delta'] / (df['load_ma24'] + 1e-6)
-df['load_ratio_ma96'] = df['load_discharge_delta'] / (df['load_ma96'] + 1e-6)
-
-# 时间交互特征
-df['hour_load_interaction'] = df['hour'] * df['load_discharge_delta']
-df['weekday_load_interaction'] = df['weekday'] * df['load_discharge_delta']
-df['is_peak_load_interaction'] = df['is_peak'] * df['load_discharge_delta']
-
-df['prev_load'] = df['load_discharge_delta'].shift(1)
-
-df = df.fillna(method='ffill').fillna(method='bfill').dropna()
-
-# 清理无穷大和异常值
-print("INFO: Cleaning infinite values and outliers...")
-numeric_cols = df.select_dtypes(include=[np.number]).columns
-for col in numeric_cols:
-    if col in df.columns:
-        # 替换无穷大值
-        df[col] = df[col].replace([np.inf, -np.inf], np.nan)
-        # 填充 NaN
-        df[col] = df[col].fillna(df[col].median() if not df[col].isna().all() else 0)
-        # 处理极端异常值 (超过99.9%分位数的值)
-        if df[col].std() > 0:
-            upper_bound = df[col].quantile(0.999)
-            lower_bound = df[col].quantile(0.001)
-            df[col] = df[col].clip(lower=lower_bound, upper=upper_bound)
-
-# ---------- 载入特征列 & Scaler ----------
-enc_cols = joblib.load(f'{ROOT}/enc_cols.pkl')
-dec_cols = joblib.load(f'{ROOT}/dec_cols.pkl')
-sc_enc   = joblib.load(f'{ROOT}/scaler_enc.pkl')
-sc_dec   = joblib.load(f'{ROOT}/scaler_dec.pkl')
-sc_y_energy = joblib.load(f'{ROOT}/scaler_y_energy.pkl')
-sc_y_power  = joblib.load(f'{ROOT}/scaler_y_power.pkl')
-
-# 补全缺失列
-for col in set(enc_cols + dec_cols):
-    if col not in df.columns:
-        df[col] = 0
-
-# ---------- 滑窗 - 双输出 ----------
-def make_ds(data):
-    Xp,Xf,Y_energy,Y_power = [],[],[],[]
+def add_power_features(df):
+    """Add power-based features"""
+    # Lag features for power
+    for lag in [1,2,4,8,12,24,48,96]:
+        df[f'power_lag{lag}'] = df['total_active_power'].shift(lag)
+        df[f'not_use_power_lag{lag}'] = df['not_use_power'].shift(lag)
     
-    # 最终数据验证
-    print("INFO: Validating data quality...")
-    for col in set(enc_cols + dec_cols + ['load_discharge_delta', 'total_active_power']):
-        if col in data.columns:
-            if data[col].isnull().any():
-                print(f"WARNING: {col} has {data[col].isnull().sum()} null values, filling with median")
-                data[col] = data[col].fillna(data[col].median())
-            if np.isinf(data[col]).any():
-                print(f"WARNING: {col} has infinite values, replacing with boundary values")
-                data[col] = data[col].replace([np.inf, -np.inf], [data[col].quantile(0.99), data[col].quantile(0.01)])
+    # Rolling statistics for power
+    for w in [4,8,12,24,48,96]:
+        df[f'power_ma{w}']  = df['total_active_power'].rolling(w,1).mean()
+        df[f'power_std{w}'] = df['total_active_power'].rolling(w,1).std()
+        df[f'not_use_power_ma{w}']  = df['not_use_power'].rolling(w,1).mean()
+        df[f'not_use_power_std{w}'] = df['not_use_power'].rolling(w,1).std()
     
-    enc = sc_enc.transform(data[enc_cols])
-    dec = sc_dec.transform(data[dec_cols])
-    y_energy = sc_y_energy.transform(data[['load_discharge_delta']])
-    y_power  = sc_y_power.transform(data[['total_active_power']])
-    for i in range(len(data)-PAST-FUT+1):
-        Xp.append(enc[i:i+PAST])
-        Xf.append(dec[i+PAST:i+PAST+FUT])
-        Y_energy.append(y_energy[i+PAST:i+PAST+FUT,0])
-        Y_power.append(y_power[i+PAST:i+PAST+FUT,0])
-    return (np.array(Xp,np.float32), np.array(Xf,np.float32), 
-            np.array(Y_energy,np.float32), np.array(Y_power,np.float32))
+    # Previous power for teacher forcing
+    df['prev_power'] = df['total_active_power'].shift(1)
+    df['prev_not_use_power'] = df['not_use_power'].shift(1)
+    
+    # Weekly/bi-weekly lags
+    for lag in [7*96, 14*96]:  
+        if len(df) > lag:
+            df[f'power_lag{lag//96}d'] = df['total_active_power'].shift(lag)
+            df[f'not_use_power_lag{lag//96}d'] = df['not_use_power'].shift(lag)
+    
+    # Power ratio features
+    df['power_ratio'] = df['not_use_power'] / (df['total_active_power'] + 1e-6)
+    df['power_ratio'] = df['power_ratio'].clip(0, 1)
+    
+    return df
 
-Xp,Xf,Y_energy,Y_power = make_ds(df)
-if len(Xp)==0:
-    raise ValueError('增量数据不足以形成滑窗样本')
-loader = DataLoader(TensorDataset(torch.from_numpy(Xp),
-                                  torch.from_numpy(Xf),
-                                  torch.from_numpy(Y_energy),
-                                  torch.from_numpy(Y_power)),
-                    batch_size=BATCH_SIZE, shuffle=True)
-
-# ---------- 模型 - 双输出 ----------
-class EncDec(nn.Module):
-    def __init__(self,d_enc,d_dec,hid,drop):
-        super().__init__()
-        self.enc = nn.LSTM(d_enc,hid,batch_first=True)
-        self.dec = nn.LSTM(d_dec,hid,batch_first=True)
-        self.dp  = nn.Dropout(drop)
-        self.fc_energy = nn.Linear(hid,1)  # 电量预测
-        self.fc_power  = nn.Linear(hid,1)  # 功率预测
-    def forward(self,xe,xd):
-        _,(h,c)=self.enc(xe)
-        out,_ = self.dec(xd,(h,c))
-        out_dp = self.dp(out)
-        energy_pred = self.fc_energy(out_dp).squeeze(-1)
-        power_pred = self.fc_power(out_dp).squeeze(-1)
-        return energy_pred, power_pred
-
-# ---------- 增强模型结构（与fine_tune_station.py一致） - 双输出 ----------
-class EnhancedEncDec(nn.Module):
-    def __init__(self, base_model, hid, drop):
-        super().__init__()
-        # 复制基础模型的参数
-        self.enc = base_model.enc
-        self.dec = base_model.dec
-        self.dp = base_model.dp
+def add_advanced_features(df, use_stl=True):
+    """Add STL and quantile features"""
+    if use_stl and len(df)>=96*14:
+        # STL for total power
+        res_power = STL(df['total_active_power'], period=96*7, robust=True).fit()
+        df['power_trend']    = res_power.trend
+        df['power_seasonal'] = res_power.seasonal
+        df['power_resid']    = res_power.resid
         
-        # 添加增强层
-        self.bn = nn.BatchNorm1d(hid)
-        # 使用更复杂的输出层
-        self.fc_energy_enhanced = nn.Sequential(
-            nn.Linear(hid, hid//2),
-            nn.ReLU(),
-            nn.Dropout(drop/2),
-            nn.Linear(hid//2, 1)
-        )
-        self.fc_power_enhanced = nn.Sequential(
-            nn.Linear(hid, hid//2),
-            nn.ReLU(),
-            nn.Dropout(drop/2),
-            nn.Linear(hid//2, 1)
-        )
-        
-        # 保留原始输出层用于残差连接
-        self.fc_energy_orig = base_model.fc_energy
-        self.fc_power_orig = base_model.fc_power
-        
-    def forward(self, xe, xd):
-        _, (h,c) = self.enc(xe)
-        out,_ = self.dec(xd,(h,c))
-        out_dp = self.dp(out)
-        
-        # 应用批归一化（需要调整维度）
-        batch_size, seq_len, hidden_size = out_dp.shape
-        out_bn = self.bn(out_dp.transpose(1, 2)).transpose(1, 2)
-        
-        # 增强预测 + 原始预测的残差连接
-        energy_enhanced = self.fc_energy_enhanced(out_bn).squeeze(-1)
-        power_enhanced = self.fc_power_enhanced(out_bn).squeeze(-1)
-        
-        energy_orig = self.fc_energy_orig(out_dp).squeeze(-1)
-        power_orig = self.fc_power_orig(out_dp).squeeze(-1)
-        
-        # 残差连接：增强预测 + 0.3 * 原始预测
-        energy_pred = energy_enhanced + 0.3 * energy_orig
-        power_pred = power_enhanced + 0.3 * power_orig
-        
-        return energy_pred, power_pred
-
-# --- Weighted L1 (针对单站优化权重) ---
-class WeightedL1(nn.Module):
-    def __init__(self,fut,device):
-        super().__init__()
-        # 根据MAPE结果调整权重：对表现差的天数给更高权重
-        w = np.concatenate([
-            np.ones(96)*1.8,      # Day1: 59.68% -> 提高权重
-            np.ones(96)*2.2,      # Day2: 89.27% -> 最高权重
-            np.ones(96)*1.0,      # Day3: 25.58% -> 保持基础权重
-            np.ones(96)*1.6,      # Day4: 52.51% -> 提高权重
-            np.ones(96)*2.0,      # Day5: 92.49% -> 高权重
-            np.ones(96)*1.0,      # Day6: 16.92% -> 保持基础权重
-            np.ones(96)*1.7       # Day7: 64.59% -> 提高权重
-        ])
-        self.register_buffer('w', torch.tensor(w,dtype=torch.float32,device=device))
-    def forward(self,pred,tgt):
-        return torch.mean(self.w*torch.abs(pred-tgt))
-
-# 创建基础模型
-base_model = EncDec(len(enc_cols), len(dec_cols), 128, .24).to(DEVICE)
-
-# --- 载入历史权重 ---
-opt_path = f'{MODEL_DIR}/model_optimized_{STATION_ID}.pth'
-base_path= f'{ROOT}/model_weighted.pth'   # 你的总模型权重
-
-if os.path.exists(opt_path):
-    # 如果存在微调权重，使用增强模型
-    base_model.load_state_dict(torch.load(base_path, map_location=DEVICE))
-    model = EnhancedEncDec(base_model, 128, .24).to(DEVICE)
-    model.load_state_dict(torch.load(opt_path, map_location=DEVICE))
-    print(">>> 加载已微调的增强模型权重")
-else:
-    # 如果不存在微调权重，使用基础模型
-    model = base_model
-    model.load_state_dict(torch.load(base_path, map_location=DEVICE))
-    print(">>> 加载基础权重（首次增量）")
-
-# 冻结 Encoder
-for p in model.enc.parameters():
-    p.requires_grad_(False)
-
-criterion = WeightedL1(FUT, DEVICE)
-# 使用AdamW优化器，添加权重衰减
-optimizer = torch.optim.AdamW(filter(lambda p:p.requires_grad, model.parameters()), 
-                             lr=LR_INCR, weight_decay=1e-5)
-# 调整调度器参数，更耐心等待
-scheduler = ReduceLROnPlateau(optimizer,'min',patience=5,factor=.7,min_lr=1e-6)
-
-best=float('inf'); wait=0
-print(f"🚀 增量训练样本 {len(loader.dataset)}   batch {BATCH_SIZE}")
-for ep in range(1,EPOCHS+1):
-    model.train(); ep_loss=0
-    for xe,xd,yy_energy,yy_power in loader:
-        xe,xd,yy_energy,yy_power = xe.to(DEVICE),xd.to(DEVICE),yy_energy.to(DEVICE),yy_power.to(DEVICE)
-        optimizer.zero_grad()
-        pred_energy, pred_power = model(xe,xd)
-        loss_energy = criterion(pred_energy,yy_energy)
-        loss_power = criterion(pred_power,yy_power)
-        loss = loss_energy + loss_power
-        loss.backward(); optimizer.step()
-        ep_loss += loss.item()
-    ep_loss /= len(loader); scheduler.step(ep_loss)
-
-    log=f'E{ep:02d} loss {ep_loss:.4f}'
-    if ep_loss<best:
-        best=ep_loss; wait=0
-        torch.save(model.state_dict(), opt_path)
-        log+=' ✔ save'
+        # STL for not_use_power
+        res_not_use = STL(df['not_use_power'], period=96*7, robust=True).fit()
+        df['not_use_power_trend']    = res_not_use.trend
+        df['not_use_power_seasonal'] = res_not_use.seasonal
+        df['not_use_power_resid']    = res_not_use.resid
     else:
-        wait+=1
-        if wait>=8:  # 增加早停耐心，给模型更多时间优化
-            log+=' (early stop)'; print(log); break
-    print(log)
+        df[['power_trend','power_seasonal','power_resid']] = np.nan
+        df[['not_use_power_trend','not_use_power_seasonal','not_use_power_resid']] = np.nan
+    
+    # Quantile normalization
+    df['power_q10_48'] = df['total_active_power'].rolling(48,1).quantile(.1)
+    df['power_q90_48'] = df['total_active_power'].rolling(48,1).quantile(.9)
+    df['power_norm_48']= df['total_active_power'] / (df['power_q90_48'] + 1e-6)
+    
+    df['not_use_power_q10_48'] = df['not_use_power'].rolling(48,1).quantile(.1)
+    df['not_use_power_q90_48'] = df['not_use_power'].rolling(48,1).quantile(.9)
+    df['not_use_power_norm_48']= df['not_use_power'] / (df['not_use_power_q90_48'] + 1e-6)
+    
+    return df
 
-# ---------- 简易评估 - 双输出 ----------
-def day_mape(t,p):
-    res=[]
-    for d in range(7):
-        s,e=d*96,(d+1)*96
-        t0,t1=t[s:e],p[s:e]
-        # 更严格的处理：过滤掉异常值
-        mask = (np.abs(t0) > 1e-3) & np.isfinite(t0) & np.isfinite(t1)
-        if mask.sum() == 0:
-            res.append(0.0)  # 如果没有有效数据，返回0
+def prepare_incremental_data(data_file, station_id):
+    """Prepare incremental data with same preprocessing as training"""
+    print(f"📊 Loading incremental data from {data_file}...")
+    df = pd.read_csv(data_file, parse_dates=['ts'])
+    df = df.sort_values(['station_ref_id', 'ts'])
+    
+    # Filter for specific station
+    df = df[df['station_ref_id'] == station_id].copy()
+    if len(df) == 0:
+        raise ValueError(f"No data found for station {station_id}")
+    
+    # Create not_use_power if not exists
+    if 'not_use_power' not in df.columns:
+        df['not_use_power'] = df['total_active_power'] * 0.7
+        print("⚠️  not_use_power field created as 70% of total_active_power")
+    
+    # Clean power data
+    df['total_active_power'] = df['total_active_power'].clip(lower=0)
+    df['not_use_power'] = df['not_use_power'].clip(lower=0)
+    
+    # Rename ts to energy_date for compatibility
+    df = df.rename(columns={'ts': 'energy_date'})
+    
+    # Handle optional fields with defaults
+    optional_fields = {
+        'temp': 25.0,           
+        'humidity': 60.0,       
+        'windSpeed': 5.0,       
+        'code': 999             
+    }
+    
+    for field, default_value in optional_fields.items():
+        if field not in df.columns:
+            df[field] = default_value
+    
+    df['code'] = df['code'].fillna(999).astype(int)
+    
+    # One-hot encoding for code
+    df = pd.concat([df, pd.get_dummies(df['code'].astype(str), prefix='code')], axis=1)
+    
+    # Feature engineering
+    df = enrich_features(df)
+    df = add_power_features(df)
+    df = add_advanced_features(df)
+    
+    # Data cleaning
+    df = df.fillna(method='ffill').fillna(method='bfill')
+    df = df.dropna(subset=['total_active_power', 'not_use_power'])
+    
+    # Fill remaining NaN values
+    for col in ['power_trend','power_seasonal','power_resid',
+                'not_use_power_trend','not_use_power_seasonal','not_use_power_resid',
+                'power_q10_48','power_q90_48','power_norm_48',
+                'not_use_power_q10_48','not_use_power_q90_48','not_use_power_norm_48',
+                'prev_power','prev_not_use_power']:
+        if col in df.columns:
+            df[col] = df[col].fillna(0)
+    
+    # Clean infinite and extreme values
+    numeric_cols = df.select_dtypes(include=[np.number]).columns
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = df[col].replace([np.inf, -np.inf], np.nan)
+            df[col] = df[col].fillna(df[col].median() if not df[col].isna().all() else 0)
+            if df[col].std() > 0:
+                upper_bound = df[col].quantile(0.999)
+                lower_bound = df[col].quantile(0.001)
+                df[col] = df[col].clip(lower=lower_bound, upper=upper_bound)
+    
+    return df
+
+def create_finetune_dataset(data, enc_cols, dec_cols, sc_e, sc_d, sc_y_power, sc_y_not_use_power, past_steps, future_steps):
+    """Create dataset for fine-tuning using existing scalers"""
+    Xp, Xf, Y_power, Y_not_use_power = [], [], [], []
+    
+    # Use existing scalers to transform data
+    e_all = sc_e.transform(data[enc_cols])
+    d_all = sc_d.transform(data[dec_cols])
+    y_power_all = sc_y_power.transform(data[['total_active_power']])
+    y_not_use_power_all = sc_y_not_use_power.transform(data[['not_use_power']])
+    
+    e_df = pd.DataFrame(e_all, columns=enc_cols, index=data.index)
+    e_df['y_power'] = y_power_all
+    e_df['y_not_use_power'] = y_not_use_power_all
+    d_df = pd.DataFrame(d_all, columns=dec_cols, index=data.index)
+    
+    if len(data) < past_steps + future_steps:
+        raise ValueError(f"Insufficient data for fine-tuning: {len(data)} < {past_steps + future_steps}")
+        
+    e_arr = e_df[enc_cols].values
+    d_arr = d_df[dec_cols].values
+    y_power_arr = e_df['y_power'].values
+    y_not_use_power_arr = e_df['y_not_use_power'].values
+    
+    for i in range(len(data) - past_steps - future_steps + 1):
+        Xp.append(e_arr[i:i+past_steps])
+        Xf.append(d_arr[i+past_steps:i+past_steps+future_steps])
+        Y_power.append(y_power_arr[i+past_steps:i+past_steps+future_steps])
+        Y_not_use_power.append(y_not_use_power_arr[i+past_steps:i+past_steps+future_steps])
+    
+    return (np.array(Xp, np.float32), np.array(Xf, np.float32),
+            np.array(Y_power, np.float32), np.array(Y_not_use_power, np.float32))
+
+def finetune_model(model_dir, incremental_data_file, station_id):
+    """Fine-tune existing model with incremental data"""
+    t0 = time.time()
+    
+    # Load existing model components
+    print(f"📂 Loading model from {model_dir}...")
+    if not os.path.exists(model_dir):
+        raise ValueError(f"Model directory not found: {model_dir}")
+    
+    # Load configuration and components
+    cfg = joblib.load(f'{model_dir}/config.pkl')
+    enc_cols = joblib.load(f'{model_dir}/enc_cols.pkl')
+    dec_cols = joblib.load(f'{model_dir}/dec_cols.pkl')
+    sc_e = joblib.load(f'{model_dir}/scaler_enc.pkl')
+    sc_d = joblib.load(f'{model_dir}/scaler_dec.pkl')
+    sc_y_power = joblib.load(f'{model_dir}/scaler_y_power.pkl')
+    sc_y_not_use_power = joblib.load(f'{model_dir}/scaler_y_not_use_power.pkl')
+    station_info = joblib.load(f'{model_dir}/station_info.pkl')
+    
+    print(f"🎯 Fine-tuning model for station: {station_info['station_id']}")
+    
+    # Prepare incremental data
+    df_new = prepare_incremental_data(incremental_data_file, station_id)
+    print(f"📊 Incremental data points: {len(df_new):,}")
+    
+    # Ensure all required columns exist in new data
+    missing_cols = []
+    for col in enc_cols + dec_cols:
+        if col not in df_new.columns:
+            missing_cols.append(col)
+    
+    if missing_cols:
+        print(f"⚠️  Missing columns in incremental data: {missing_cols}")
+        # Fill missing columns with zeros or appropriate defaults
+        for col in missing_cols:
+            df_new[col] = 0
+    
+    # Create fine-tuning dataset
+    Xp, Xf, Y_power, Y_not_use_power = create_finetune_dataset(
+        df_new, enc_cols, dec_cols, sc_e, sc_d, sc_y_power, sc_y_not_use_power,
+        cfg['past_steps'], cfg['future_steps']
+    )
+    
+    print(f"🍱 Fine-tuning samples: {len(Xp)}")
+    
+    if len(Xp) == 0:
+        raise ValueError("No samples generated for fine-tuning. Check data length and parameters.")
+    
+    # Create data loaders
+    ft_ds = TensorDataset(torch.from_numpy(Xp), torch.from_numpy(Xf),
+                         torch.from_numpy(Y_power), torch.from_numpy(Y_not_use_power))
+    ft_loader = DataLoader(ft_ds, batch_size=FINETUNE_CFG['batch_size'], shuffle=True)
+    
+    # Load and initialize model
+    dev = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print(f"🖥️  Using device: {dev}")
+    
+    model = EncDecPowerModel(len(enc_cols), len(dec_cols), cfg['hidden_dim'], 
+                            cfg['drop_rate'], cfg['num_layers']).to(dev)
+    
+    # Load pre-trained weights
+    model.load_state_dict(torch.load(f'{model_dir}/model_power.pth', map_location=dev))
+    print("✅ Pre-trained model loaded successfully")
+    
+    # Setup for fine-tuning
+    crit = WeightedL1Loss(cfg['future_steps'], dev)
+    opt = torch.optim.AdamW(model.parameters(), lr=FINETUNE_CFG['lr'], weight_decay=1e-6)
+    sch = ReduceLROnPlateau(opt, 'min', patience=5, factor=.8)
+    
+    # Fine-tuning loop
+    best = 1e9
+    wait = 0
+    print("⏳ Fine-tuning...")
+    
+    for ep in range(1, FINETUNE_CFG['epochs'] + 1):
+        model.train()
+        ft_loss = 0
+        
+        for xe, xd, yy_power, yy_not_use_power in ft_loader:
+            xe, xd, yy_power, yy_not_use_power = xe.to(dev), xd.to(dev), yy_power.to(dev), yy_not_use_power.to(dev)
+            opt.zero_grad()
+            pred_power, pred_not_use_power = model(xe, xd)
+            loss_power = crit(pred_power, yy_power)
+            loss_not_use_power = crit(pred_not_use_power, yy_not_use_power)
+            loss = FINETUNE_CFG['power_weight'] * loss_power + FINETUNE_CFG['not_use_power_weight'] * loss_not_use_power
+            loss.backward()
+            opt.step()
+            ft_loss += loss.item()
+        
+        ft_loss /= len(ft_loader)
+        sch.step(ft_loss)
+        
+        if ep % 5 == 0:
+            print(f'FT-E{ep:03d} loss{ft_loss:.4f}')
+        
+        if ft_loss < best:
+            best = ft_loss
+            wait = 0
+            # Save fine-tuned model
+            torch.save(model.state_dict(), f'{model_dir}/model_power_finetuned.pth')
         else:
-            t0_filtered = t0[mask]
-            t1_filtered = t1[mask]
-            # 使用绝对值确保分母为正
-            t0_filtered = np.where(np.abs(t0_filtered) < 1e-3, 
-                                 np.sign(t0_filtered) * 1e-3, t0_filtered)
-            mape = np.mean(np.abs((t0_filtered - t1_filtered) / t0_filtered)) * 100
-            # 限制MAPE的最大值，避免极端情况
-            res.append(min(mape, 1000.0))
-    return res
-
-model.eval()
-with torch.no_grad():
-    xe=torch.from_numpy(Xp[-1:].astype(np.float32)).to(DEVICE)
-    xd=torch.from_numpy(Xf[-1:].astype(np.float32)).to(DEVICE)
-    pred_energy_s, pred_power_s = model(xe,xd)
-    pred_energy_s = pred_energy_s.cpu().numpy().flatten()
-    pred_power_s = pred_power_s.cpu().numpy().flatten()
+            wait += 1
+            if wait >= FINETUNE_CFG['patience']:
+                print("ℹ️  Early stopping")
+                break
     
-    pred_energy = sc_y_energy.inverse_transform(pred_energy_s.reshape(-1,1)).flatten()
-    pred_power = sc_y_power.inverse_transform(pred_power_s.reshape(-1,1)).flatten()
+    # Update station info
+    station_info['finetuned'] = True
+    station_info['finetune_data_points'] = len(df_new)
+    station_info['finetune_samples'] = len(Xp)
+    station_info['finetune_time'] = time.time() - t0
+    joblib.dump(station_info, f'{model_dir}/station_info.pkl')
     
-    true_energy = sc_y_energy.inverse_transform(Y_energy[-1:].reshape(-1,1)).flatten()
-    true_power = sc_y_power.inverse_transform(Y_power[-1:].reshape(-1,1)).flatten()
-
-    # 安全的MAPE计算
-    def safe_mape(y_true, y_pred):
-        mask = (np.abs(y_true) > 1e-3) & np.isfinite(y_true) & np.isfinite(y_pred)
-        if mask.sum() == 0:
-            return 0.0
-        y_true_filtered = y_true[mask]
-        y_pred_filtered = y_pred[mask]
-        y_true_filtered = np.where(np.abs(y_true_filtered) < 1e-3, 
-                                 np.sign(y_true_filtered) * 1e-3, y_true_filtered)
-        mape = np.mean(np.abs((y_true_filtered - y_pred_filtered) / y_true_filtered)) * 100
-        return min(mape, 1000.0)
+    print(f"✅ Fine-tuning completed!")
+    print(f"📊 Fine-tuning data points: {len(df_new):,}")
+    print(f"🍱 Fine-tuning samples: {len(Xp):,}")
+    print(f"⏱️  Fine-tuning time: {time.time()-t0:.1f}s")
+    print(f"💾 Fine-tuned model saved to: {model_dir}/model_power_finetuned.pth")
     
-    overall_energy = safe_mape(true_energy, pred_energy)
-    overall_power = safe_mape(true_power, pred_power)
+    return model_dir
+
+def main():
+    parser = argparse.ArgumentParser(description='Fine-tune single station power prediction model')
+    parser.add_argument('--model_dir', type=str, required=True, 
+                       help='Directory containing the pre-trained model')
+    parser.add_argument('--data_file', type=str, required=True,
+                       help='Incremental data file for fine-tuning')
+    parser.add_argument('--station_id', type=str, required=True,
+                       help='Station ID to fine-tune model for')
     
-    dm_energy = day_mape(true_energy,pred_energy)
-    dm_power = day_mape(true_power,pred_power)
+    args = parser.parse_args()
+    
+    try:
+        model_dir = finetune_model(args.model_dir, args.data_file, args.station_id)
+        print(f"🎉 Fine-tuning completed successfully! Model updated in: {model_dir}")
+    except Exception as e:
+        print(f"❌ Fine-tuning failed: {str(e)}")
+        raise
 
-print(f'\nRESULT: Energy 7-day MAPE {overall_energy:.2f}%  | '+
-      '  '.join([f'D{i+1}:{m:.2f}%' for i,m in enumerate(dm_energy)]))
-print(f'RESULT: Power  7-day MAPE {overall_power:.2f}%   | '+
-      '  '.join([f'D{i+1}:{m:.2f}%' for i,m in enumerate(dm_power)]))
-
-# ---------- 更新尾巴缓存 ----------
-# 保存时使用原始字段名 ts
-df_cache = df.tail(PAST+FUT).copy()
-df_cache = df_cache.rename(columns={'energy_date': 'ts'})
-df_cache.to_csv(TAIL_PATH,index=False)
-print("\nSUCCESS: Incremental fine-tuning completed, weights & tail cache updated")
+if __name__ == "__main__":
+    main()
