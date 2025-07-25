@@ -1,5 +1,5 @@
 # =========================================================
-#  Single Station Encoder–Decoder Model for Power Prediction
+#  Single Station Encoder-Decoder Model for Power Prediction
 #  Predicts: total_active_power and not_use_power for 7 days
 # =========================================================
 import os, warnings, gc, time
@@ -21,27 +21,27 @@ warnings.filterwarnings("ignore")
 CFG = dict(
     past_steps   = 96*7,          # 7 days history (15min intervals)
     future_steps = 96*7,          # 7 days prediction (672 points)
-    hidden_dim   = 256,           
-    num_layers   = 2,             
-    drop_rate    = .3,            
-    batch_size   = 128,            
+    hidden_dim   = 512,           
+    num_layers   = 1,             
+    drop_rate    = .4,            
+    batch_size   = 256,            
     epochs       = 200,           
     patience     = 30,            
-    lr           = 1e-4,          
-    top_k        = 80,            # Reduced features since no energy fields
+    lr           = 0.0001,          
+    top_k        = 90,            # Reduced features since no energy fields
     lgb_rounds   = 500,
-    use_stl      = False,          
+    use_stl      = True,          
     power_weight = 1.0,           # Main prediction weight
-    not_use_power_weight = 0.8    # Secondary prediction weight
+    not_use_power_weight = 0.7    # Secondary prediction weight
 )
 
 def main(station_id=None, data_file='merged_station_test.csv'):
     t0 = time.time()
     
     # =========================================================
-    # 1️⃣ Read and filter data for specific station
+    # 1. Read and filter data for specific station
     # =========================================================
-    print(f"📊 Loading data from {data_file}...")
+    print(f"Loading data from {data_file}...")
     df = pd.read_csv(data_file, parse_dates=['ts'], dtype={'station_ref_id': str})
     df = df.sort_values(['station_ref_id', 'ts'])
     
@@ -50,13 +50,13 @@ def main(station_id=None, data_file='merged_station_test.csv'):
         df = df[df['station_ref_id'] == station_id].copy()
         if len(df) == 0:
             raise ValueError(f"No data found for station {station_id}")
-        print(f"🎯 Training model for station: {station_id}")
+        print(f"Training model for station: {station_id}")
         output_dir = f"models/station_{station_id}"
     else:
         # Use first station if none specified
         station_id = df['station_ref_id'].iloc[0]
         df = df[df['station_ref_id'] == station_id].copy()
-        print(f"🎯 Training model for station: {station_id} (first station)")
+        print(f"Training model for station: {station_id} (first station)")
         output_dir = f"models/station_{station_id}"
     
     os.makedirs(output_dir, exist_ok=True)
@@ -71,7 +71,7 @@ def main(station_id=None, data_file='merged_station_test.csv'):
     if 'not_use_power' not in df.columns:
         # Estimate not_use_power as a portion of total_active_power
         df['not_use_power'] = df['total_active_power'] * 0.7  # Assume 70% is non-controllable
-        print("⚠️  not_use_power field created as 70% of total_active_power")
+        print("WARNING: not_use_power field created as 70% of total_active_power")
     
     # Clean power data
     df['total_active_power'] = df['total_active_power'].clip(lower=0)
@@ -91,7 +91,7 @@ def main(station_id=None, data_file='merged_station_test.csv'):
     for field, default_value in optional_fields.items():
         if field not in df.columns:
             df[field] = default_value
-            print(f"⚠️  Field '{field}' missing, set default: {default_value}")
+            print(f"WARNING: Field '{field}' missing, set default: {default_value}")
     
     df['code'] = df['code'].fillna(999).astype(int)
     
@@ -99,7 +99,7 @@ def main(station_id=None, data_file='merged_station_test.csv'):
     df = pd.concat([df, pd.get_dummies(df['code'].astype(str), prefix='code')], axis=1)
     
     # =========================================================
-    # 2️⃣ Time/Weather/Holiday Features
+    # 2. Time/Weather/Holiday Features
     # =========================================================
     cn_holidays = holidays.country_holidays('CN')
     
@@ -148,7 +148,7 @@ def main(station_id=None, data_file='merged_station_test.csv'):
     df = enrich_features(df)
     
     # =========================================================
-    # 3️⃣ Power-based Features (NO ENERGY FIELDS)
+    # 3. Power-based Features (NO ENERGY FIELDS)
     # =========================================================
     # Lag features for power
     for lag in [1,2,4,8,12,24,48,96]:
@@ -177,7 +177,7 @@ def main(station_id=None, data_file='merged_station_test.csv'):
     df['power_ratio'] = df['power_ratio'].clip(0, 1)  # Ratio should be 0-1
     
     # =========================================================
-    # 4️⃣ STL Decomposition + Quantile Normalization
+    # 4. STL Decomposition + Quantile Normalization
     # =========================================================
     def add_advanced_features(g):
         if CFG['use_stl'] and len(g)>=96*14:
@@ -210,7 +210,7 @@ def main(station_id=None, data_file='merged_station_test.csv'):
     df = add_advanced_features(df)
     
     # =========================================================
-    # 5️⃣ Data Cleaning
+    # 5. Data Cleaning
     # =========================================================
     df = df.fillna(method='ffill').fillna(method='bfill')
     df = df.dropna(subset=['total_active_power', 'not_use_power'])
@@ -225,7 +225,7 @@ def main(station_id=None, data_file='merged_station_test.csv'):
             df[col] = df[col].fillna(0)
     
     # Clean infinite and extreme values
-    print("🧹 Cleaning infinite and extreme values...")
+    print("Cleaning infinite and extreme values...")
     numeric_cols = df.select_dtypes(include=[np.number]).columns
     for col in numeric_cols:
         if col in df.columns:
@@ -236,10 +236,10 @@ def main(station_id=None, data_file='merged_station_test.csv'):
                 lower_bound = df[col].quantile(0.001)
                 df[col] = df[col].clip(lower=lower_bound, upper=upper_bound)
     
-    print(f"🟢 Data rows: {len(df):,}")
+    print(f"Data rows: {len(df):,}")
     
     # =========================================================
-    # 6️⃣ Feature Selection
+    # 6. Feature Selection
     # =========================================================
     # Exclude energy fields and target fields
     ENC_FULL = [c for c in df.columns
@@ -251,7 +251,7 @@ def main(station_id=None, data_file='merged_station_test.csv'):
                ['prev_power', 'prev_not_use_power']
     
     # =========================================================
-    # 7️⃣ LightGBM Feature Selection
+    # 7. LightGBM Feature Selection
     # =========================================================
     if len(df) >= 1000:
         sample_df = df.sample(frac=0.3, random_state=42)
@@ -295,24 +295,24 @@ def main(station_id=None, data_file='merged_station_test.csv'):
         if prev_col not in DEC_COLS and prev_col in df.columns:
             DEC_COLS.append(prev_col)
     
-    print(f"✅ Selected {len(ENC_COLS)} encoder, {len(DEC_COLS)} decoder features")
+    print(f"Selected {len(ENC_COLS)} encoder, {len(DEC_COLS)} decoder features")
     
     # =========================================================
-    # 8️⃣ Create Dataset - Dual Output
+    # 8. Create Dataset - Dual Output
     # =========================================================
     def make_dataset(data, past, fut):
         Xp, Xf, Y_power, Y_not_use_power = [], [], [], []
         sc_e, sc_d, sc_y_power, sc_y_not_use_power = StandardScaler(), StandardScaler(), StandardScaler(), StandardScaler()
         
         # Data validation
-        print("ℹ️  Validating data quality...")
+        print("Validating data quality...")
         for col in ENC_COLS + DEC_COLS + ['total_active_power', 'not_use_power']:
             if col in data.columns:
                 if data[col].isnull().any():
-                    print(f"⚠️  {col} has {data[col].isnull().sum()} null values, filling with median")
+                    print(f"WARNING: {col} has {data[col].isnull().sum()} null values, filling with median")
                     data[col] = data[col].fillna(data[col].median())
                 if np.isinf(data[col]).any():
-                    print(f"⚠️  {col} has infinite values, replacing with boundary values")
+                    print(f"WARNING: {col} has infinite values, replacing with boundary values")
                     data[col] = data[col].replace([np.inf, -np.inf], 
                                                 [data[col].quantile(0.99), data[col].quantile(0.01)])
         
@@ -348,7 +348,7 @@ def main(station_id=None, data_file='merged_station_test.csv'):
     Xp, Xf, Y_power, Y_not_use_power, sc_e, sc_d, sc_y_power, sc_y_not_use_power = \
         make_dataset(df, CFG['past_steps'], CFG['future_steps'])
     
-    print(f"🍱 Samples: {len(Xp)}")
+    print(f"Samples: {len(Xp)}")
     
     if len(Xp) == 0:
         raise ValueError("No samples generated. Check data length and parameters.")
@@ -363,7 +363,7 @@ def main(station_id=None, data_file='merged_station_test.csv'):
     va_loader = DataLoader(va_ds, batch_size=CFG['batch_size'], shuffle=False)
     
     # =========================================================
-    # 9️⃣ Model Definition
+    # 9. Model Definition
     # =========================================================
     class EncDecPowerModel(nn.Module):
         def __init__(self, d_enc, d_dec, hid, drop, num_layers=2):
@@ -413,10 +413,10 @@ def main(station_id=None, data_file='merged_station_test.csv'):
             return torch.mean(self.w * torch.abs(pred - target))
     
     # =========================================================
-    # 🔟 Training
+    # 10. Training
     # =========================================================
     dev = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f"🖥️  Using device: {dev}")
+    print(f"Using device: {dev}")
     
     model = EncDecPowerModel(len(ENC_COLS), len(DEC_COLS), CFG['hidden_dim'], 
                             CFG['drop_rate'], CFG['num_layers']).to(dev)
@@ -426,7 +426,7 @@ def main(station_id=None, data_file='merged_station_test.csv'):
     
     best = 1e9
     wait = 0
-    print("⏳ Training...")
+    print("Training...")
     
     for ep in range(1, CFG['epochs'] + 1):
         model.train()
@@ -465,11 +465,120 @@ def main(station_id=None, data_file='merged_station_test.csv'):
         else:
             wait += 1
             if wait >= CFG['patience']:
-                print("ℹ️  Early stopping")
+                print("Early stopping")
                 break
     
     # =========================================================
-    # 1️⃣1️⃣ Save Model Components
+    # 11. Evaluation of MAPE for last 7 days
+    # =========================================================
+    print("Evaluating MAPE for last 7 days prediction...")
+    
+    model.eval()
+    all_power_preds = []
+    all_not_use_power_preds = []
+    all_power_targets = []
+    all_not_use_power_targets = []
+    
+    with torch.no_grad():
+        for xe, xd, yy_power, yy_not_use_power in va_loader:
+            xe, xd = xe.to(dev), xd.to(dev)
+            pred_power, pred_not_use_power = model(xe, xd)
+            
+            # Convert predictions back to original scale
+            pred_power_np = sc_y_power.inverse_transform(pred_power.cpu().numpy())
+            pred_not_use_power_np = sc_y_not_use_power.inverse_transform(pred_not_use_power.cpu().numpy())
+            
+            # Convert targets back to original scale
+            target_power_np = sc_y_power.inverse_transform(yy_power.numpy())
+            target_not_use_power_np = sc_y_not_use_power.inverse_transform(yy_not_use_power.numpy())
+            
+            all_power_preds.append(pred_power_np)
+            all_not_use_power_preds.append(pred_not_use_power_np)
+            all_power_targets.append(target_power_np)
+            all_not_use_power_targets.append(target_not_use_power_np)
+    
+    # Concatenate all predictions and targets
+    all_power_preds = np.concatenate(all_power_preds, axis=0)
+    all_not_use_power_preds = np.concatenate(all_not_use_power_preds, axis=0)
+    all_power_targets = np.concatenate(all_power_targets, axis=0)
+    all_not_use_power_targets = np.concatenate(all_not_use_power_targets, axis=0)
+    
+    # Calculate MAPE for each day
+    days = 7
+    points_per_day = 96  # 15-minute intervals for 24 hours
+    
+    power_mape_by_day = []
+    not_use_power_mape_by_day = []
+    
+    for day in range(days):
+        start_idx = day * points_per_day
+        end_idx = (day + 1) * points_per_day
+        
+        # Calculate MAPE for total_active_power
+        day_power_preds = all_power_preds[:, start_idx:end_idx]
+        day_power_targets = all_power_targets[:, start_idx:end_idx]
+        # Filter out zeros in targets to avoid division by zero
+        mask = day_power_targets > 1.0
+        if np.any(mask):
+            day_power_mape = mean_absolute_percentage_error(
+                day_power_targets[mask], 
+                day_power_preds[mask]
+            )
+            power_mape_by_day.append(day_power_mape)
+        else:
+            power_mape_by_day.append(np.nan)
+        
+        # Calculate MAPE for not_use_power
+        day_not_use_power_preds = all_not_use_power_preds[:, start_idx:end_idx]
+        day_not_use_power_targets = all_not_use_power_targets[:, start_idx:end_idx]
+        # Filter out zeros in targets to avoid division by zero
+        mask = day_not_use_power_targets > 1.0
+        if np.any(mask):
+            day_not_use_power_mape = mean_absolute_percentage_error(
+                day_not_use_power_targets[mask], 
+                day_not_use_power_preds[mask]
+            )
+            not_use_power_mape_by_day.append(day_not_use_power_mape)
+        else:
+            not_use_power_mape_by_day.append(np.nan)
+    
+    # Calculate overall MAPE
+    mask = all_power_targets > 1.0
+    overall_power_mape = mean_absolute_percentage_error(
+        all_power_targets[mask], 
+        all_power_preds[mask]
+    ) if np.any(mask) else np.nan
+    
+    mask = all_not_use_power_targets > 1.0
+    overall_not_use_power_mape = mean_absolute_percentage_error(
+        all_not_use_power_targets[mask], 
+        all_not_use_power_preds[mask]
+    ) if np.any(mask) else np.nan
+    
+    # Print MAPE results
+    print("\nMAPE Evaluation Results:")
+    print("------------------------")
+    print("total_active_power MAPE by day:")
+    for day, mape in enumerate(power_mape_by_day, 1):
+        print(f"  Day {day}: {mape:.2%}")
+    print(f"Overall total_active_power MAPE: {overall_power_mape:.2%}")
+    
+    print("\nnot_use_power MAPE by day:")
+    for day, mape in enumerate(not_use_power_mape_by_day, 1):
+        print(f"  Day {day}: {mape:.2%}")
+    print(f"Overall not_use_power MAPE: {overall_not_use_power_mape:.2%}")
+    
+    # Save MAPE results
+    mape_results = {
+        'power_mape_by_day': power_mape_by_day,
+        'not_use_power_mape_by_day': not_use_power_mape_by_day,
+        'overall_power_mape': overall_power_mape,
+        'overall_not_use_power_mape': overall_not_use_power_mape
+    }
+    joblib.dump(mape_results, f'{output_dir}/mape_results.pkl')
+    
+    # =========================================================
+    # 12. Save Model Components
     # =========================================================
     joblib.dump(sc_e, f'{output_dir}/scaler_enc.pkl')
     joblib.dump(sc_d, f'{output_dir}/scaler_dec.pkl')
@@ -488,11 +597,11 @@ def main(station_id=None, data_file='merged_station_test.csv'):
     }
     joblib.dump(station_info, f'{output_dir}/station_info.pkl')
     
-    print(f"✅ Model saved to {output_dir}/")
-    print(f"🎯 Station: {station_id}")
-    print(f"📊 Data points: {len(df):,}")
-    print(f"🍱 Training samples: {len(Xp):,}")
-    print(f"⏱️  Total time: {time.time()-t0:.1f}s")
+    print(f"Model saved to {output_dir}/")
+    print(f"Station: {station_id}")
+    print(f"Data points: {len(df):,}")
+    print(f"Training samples: {len(Xp):,}")
+    print(f"Total time: {time.time()-t0:.1f}s")
     
     return output_dir
 
@@ -506,7 +615,7 @@ if __name__ == "__main__":
     
     try:
         output_dir = main(args.station_id, args.data_file)
-        print(f"🎉 Training completed successfully! Model saved to: {output_dir}")
+        print(f"Training completed successfully! Model saved to: {output_dir}")
     except Exception as e:
-        print(f"❌ Training failed: {str(e)}")
+        print(f"Training failed: {str(e)}")
         raise

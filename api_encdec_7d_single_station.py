@@ -157,7 +157,7 @@ def add_advanced_features(df, use_stl=True):
 
 def load_station_model(station_id):
     """Load model components for a specific station"""
-    model_dir = f"models/station_{station_id}"
+    model_dir = f"model/station_{station_id}"
     
     if not os.path.exists(model_dir):
         raise ValueError(f"Model not found for station {station_id}")
@@ -444,7 +444,7 @@ def predict_power(station_id):
 def list_stations():
     """List available station models"""
     try:
-        models_dir = "models"
+        models_dir = "model"
         if not os.path.exists(models_dir):
             return jsonify({
                 'status': 'success',

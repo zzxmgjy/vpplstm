@@ -1,0 +1,6067 @@
+{
+  "metadata": {
+    "input_data_points": 673,
+    "interval_minutes": 15,
+    "missing_columns_filled": [
+      "not_use_power_lag14d",
+      "power_lag14d"
+    ],
+    "model_type": "EncDec_7d_Power",
+    "prediction_horizon_days": 7
+  },
+  "prediction_end": "2025-08-01T10:55:00",
+  "prediction_start": "2025-07-25T11:10:00",
+  "predictions": [
+    {
+      "day": 1,
+      "hour_of_day": 11,
+      "minute_of_hour": 10,
+      "not_use_power": 68.51641845703125,
+      "step": 1,
+      "timestamp": "2025-07-25T11:10:00",
+      "total_active_power": 67.4556655883789
+    },
+    {
+      "day": 1,
+      "hour_of_day": 11,
+      "minute_of_hour": 25,
+      "not_use_power": 78.68699645996094,
+      "step": 2,
+      "timestamp": "2025-07-25T11:25:00",
+      "total_active_power": 83.13082122802734
+    },
+    {
+      "day": 1,
+      "hour_of_day": 11,
+      "minute_of_hour": 40,
+      "not_use_power": 86.92367553710938,
+      "step": 3,
+      "timestamp": "2025-07-25T11:40:00",
+      "total_active_power": 85.70072174072266
+    },
+    {
+      "day": 1,
+      "hour_of_day": 11,
+      "minute_of_hour": 55,
+      "not_use_power": 91.82257080078125,
+      "step": 4,
+      "timestamp": "2025-07-25T11:55:00",
+      "total_active_power": 81.9244613647461
+    },
+    {
+      "day": 1,
+      "hour_of_day": 12,
+      "minute_of_hour": 10,
+      "not_use_power": 95.50288391113281,
+      "step": 5,
+      "timestamp": "2025-07-25T12:10:00",
+      "total_active_power": 79.58692169189453
+    },
+    {
+      "day": 1,
+      "hour_of_day": 12,
+      "minute_of_hour": 25,
+      "not_use_power": 98.56993103027344,
+      "step": 6,
+      "timestamp": "2025-07-25T12:25:00",
+      "total_active_power": 79.96878814697266
+    },
+    {
+      "day": 1,
+      "hour_of_day": 12,
+      "minute_of_hour": 40,
+      "not_use_power": 101.02914428710938,
+      "step": 7,
+      "timestamp": "2025-07-25T12:40:00",
+      "total_active_power": 81.51256561279297
+    },
+    {
+      "day": 1,
+      "hour_of_day": 12,
+      "minute_of_hour": 55,
+      "not_use_power": 102.99081420898438,
+      "step": 8,
+      "timestamp": "2025-07-25T12:55:00",
+      "total_active_power": 83.55225372314453
+    },
+    {
+      "day": 1,
+      "hour_of_day": 13,
+      "minute_of_hour": 10,
+      "not_use_power": 104.55682373046875,
+      "step": 9,
+      "timestamp": "2025-07-25T13:10:00",
+      "total_active_power": 85.53926849365234
+    },
+    {
+      "day": 1,
+      "hour_of_day": 13,
+      "minute_of_hour": 25,
+      "not_use_power": 105.79692077636719,
+      "step": 10,
+      "timestamp": "2025-07-25T13:25:00",
+      "total_active_power": 87.18596649169922
+    },
+    {
+      "day": 1,
+      "hour_of_day": 13,
+      "minute_of_hour": 40,
+      "not_use_power": 106.76483154296875,
+      "step": 11,
+      "timestamp": "2025-07-25T13:40:00",
+      "total_active_power": 88.4173355102539
+    },
+    {
+      "day": 1,
+      "hour_of_day": 13,
+      "minute_of_hour": 55,
+      "not_use_power": 107.51522827148438,
+      "step": 12,
+      "timestamp": "2025-07-25T13:55:00",
+      "total_active_power": 89.26787567138672
+    },
+    {
+      "day": 1,
+      "hour_of_day": 14,
+      "minute_of_hour": 10,
+      "not_use_power": 108.09938049316406,
+      "step": 13,
+      "timestamp": "2025-07-25T14:10:00",
+      "total_active_power": 89.8136978149414
+    },
+    {
+      "day": 1,
+      "hour_of_day": 14,
+      "minute_of_hour": 25,
+      "not_use_power": 108.56153869628906,
+      "step": 14,
+      "timestamp": "2025-07-25T14:25:00",
+      "total_active_power": 90.13692474365234
+    },
+    {
+      "day": 1,
+      "hour_of_day": 14,
+      "minute_of_hour": 40,
+      "not_use_power": 108.9376220703125,
+      "step": 15,
+      "timestamp": "2025-07-25T14:40:00",
+      "total_active_power": 90.30997467041016
+    },
+    {
+      "day": 1,
+      "hour_of_day": 14,
+      "minute_of_hour": 55,
+      "not_use_power": 109.25523376464844,
+      "step": 16,
+      "timestamp": "2025-07-25T14:55:00",
+      "total_active_power": 90.39081573486328
+    },
+    {
+      "day": 1,
+      "hour_of_day": 15,
+      "minute_of_hour": 10,
+      "not_use_power": 109.53468322753906,
+      "step": 17,
+      "timestamp": "2025-07-25T15:10:00",
+      "total_active_power": 90.42276763916016
+    },
+    {
+      "day": 1,
+      "hour_of_day": 15,
+      "minute_of_hour": 25,
+      "not_use_power": 109.79010009765625,
+      "step": 18,
+      "timestamp": "2025-07-25T15:25:00",
+      "total_active_power": 90.43608856201172
+    },
+    {
+      "day": 1,
+      "hour_of_day": 15,
+      "minute_of_hour": 40,
+      "not_use_power": 110.03077697753906,
+      "step": 19,
+      "timestamp": "2025-07-25T15:40:00",
+      "total_active_power": 90.45061492919922
+    },
+    {
+      "day": 1,
+      "hour_of_day": 15,
+      "minute_of_hour": 55,
+      "not_use_power": 110.26239013671875,
+      "step": 20,
+      "timestamp": "2025-07-25T15:55:00",
+      "total_active_power": 90.47801971435547
+    },
+    {
+      "day": 1,
+      "hour_of_day": 16,
+      "minute_of_hour": 10,
+      "not_use_power": 110.48800659179688,
+      "step": 21,
+      "timestamp": "2025-07-25T16:10:00",
+      "total_active_power": 90.52376556396484
+    },
+    {
+      "day": 1,
+      "hour_of_day": 16,
+      "minute_of_hour": 25,
+      "not_use_power": 110.70889282226562,
+      "step": 22,
+      "timestamp": "2025-07-25T16:25:00",
+      "total_active_power": 90.5893783569336
+    },
+    {
+      "day": 1,
+      "hour_of_day": 16,
+      "minute_of_hour": 40,
+      "not_use_power": 110.92521667480469,
+      "step": 23,
+      "timestamp": "2025-07-25T16:40:00",
+      "total_active_power": 90.6734848022461
+    },
+    {
+      "day": 1,
+      "hour_of_day": 16,
+      "minute_of_hour": 55,
+      "not_use_power": 111.13655090332031,
+      "step": 24,
+      "timestamp": "2025-07-25T16:55:00",
+      "total_active_power": 90.77326202392578
+    },
+    {
+      "day": 1,
+      "hour_of_day": 17,
+      "minute_of_hour": 10,
+      "not_use_power": 111.3421630859375,
+      "step": 25,
+      "timestamp": "2025-07-25T17:10:00",
+      "total_active_power": 90.88513946533203
+    },
+    {
+      "day": 1,
+      "hour_of_day": 17,
+      "minute_of_hour": 25,
+      "not_use_power": 111.54122924804688,
+      "step": 26,
+      "timestamp": "2025-07-25T17:25:00",
+      "total_active_power": 91.00540924072266
+    },
+    {
+      "day": 1,
+      "hour_of_day": 17,
+      "minute_of_hour": 40,
+      "not_use_power": 111.73298645019531,
+      "step": 27,
+      "timestamp": "2025-07-25T17:40:00",
+      "total_active_power": 91.13053131103516
+    },
+    {
+      "day": 1,
+      "hour_of_day": 17,
+      "minute_of_hour": 55,
+      "not_use_power": 111.91688537597656,
+      "step": 28,
+      "timestamp": "2025-07-25T17:55:00",
+      "total_active_power": 91.25753021240234
+    },
+    {
+      "day": 1,
+      "hour_of_day": 18,
+      "minute_of_hour": 10,
+      "not_use_power": 112.092529296875,
+      "step": 29,
+      "timestamp": "2025-07-25T18:10:00",
+      "total_active_power": 91.38394927978516
+    },
+    {
+      "day": 1,
+      "hour_of_day": 18,
+      "minute_of_hour": 25,
+      "not_use_power": 112.25968933105469,
+      "step": 30,
+      "timestamp": "2025-07-25T18:25:00",
+      "total_active_power": 91.50775909423828
+    },
+    {
+      "day": 1,
+      "hour_of_day": 18,
+      "minute_of_hour": 40,
+      "not_use_power": 112.41836547851562,
+      "step": 31,
+      "timestamp": "2025-07-25T18:40:00",
+      "total_active_power": 91.62760162353516
+    },
+    {
+      "day": 1,
+      "hour_of_day": 18,
+      "minute_of_hour": 55,
+      "not_use_power": 112.56863403320312,
+      "step": 32,
+      "timestamp": "2025-07-25T18:55:00",
+      "total_active_power": 91.74236297607422
+    },
+    {
+      "day": 1,
+      "hour_of_day": 19,
+      "minute_of_hour": 10,
+      "not_use_power": 112.71063232421875,
+      "step": 33,
+      "timestamp": "2025-07-25T19:10:00",
+      "total_active_power": 91.85160064697266
+    },
+    {
+      "day": 1,
+      "hour_of_day": 19,
+      "minute_of_hour": 25,
+      "not_use_power": 112.84474182128906,
+      "step": 34,
+      "timestamp": "2025-07-25T19:25:00",
+      "total_active_power": 91.9548568725586
+    },
+    {
+      "day": 1,
+      "hour_of_day": 19,
+      "minute_of_hour": 40,
+      "not_use_power": 112.97126770019531,
+      "step": 35,
+      "timestamp": "2025-07-25T19:40:00",
+      "total_active_power": 92.0522232055664
+    },
+    {
+      "day": 1,
+      "hour_of_day": 19,
+      "minute_of_hour": 55,
+      "not_use_power": 113.09056091308594,
+      "step": 36,
+      "timestamp": "2025-07-25T19:55:00",
+      "total_active_power": 92.14373016357422
+    },
+    {
+      "day": 1,
+      "hour_of_day": 20,
+      "minute_of_hour": 10,
+      "not_use_power": 113.20307922363281,
+      "step": 37,
+      "timestamp": "2025-07-25T20:10:00",
+      "total_active_power": 92.22953033447266
+    },
+    {
+      "day": 1,
+      "hour_of_day": 20,
+      "minute_of_hour": 25,
+      "not_use_power": 113.30926513671875,
+      "step": 38,
+      "timestamp": "2025-07-25T20:25:00",
+      "total_active_power": 92.30989837646484
+    },
+    {
+      "day": 1,
+      "hour_of_day": 20,
+      "minute_of_hour": 40,
+      "not_use_power": 113.409423828125,
+      "step": 39,
+      "timestamp": "2025-07-25T20:40:00",
+      "total_active_power": 92.3852767944336
+    },
+    {
+      "day": 1,
+      "hour_of_day": 20,
+      "minute_of_hour": 55,
+      "not_use_power": 113.50390625,
+      "step": 40,
+      "timestamp": "2025-07-25T20:55:00",
+      "total_active_power": 92.45592498779297
+    },
+    {
+      "day": 1,
+      "hour_of_day": 21,
+      "minute_of_hour": 10,
+      "not_use_power": 113.59309387207031,
+      "step": 41,
+      "timestamp": "2025-07-25T21:10:00",
+      "total_active_power": 92.52225494384766
+    },
+    {
+      "day": 1,
+      "hour_of_day": 21,
+      "minute_of_hour": 25,
+      "not_use_power": 113.67733764648438,
+      "step": 42,
+      "timestamp": "2025-07-25T21:25:00",
+      "total_active_power": 92.58460235595703
+    },
+    {
+      "day": 1,
+      "hour_of_day": 21,
+      "minute_of_hour": 40,
+      "not_use_power": 113.75692749023438,
+      "step": 43,
+      "timestamp": "2025-07-25T21:40:00",
+      "total_active_power": 92.64315032958984
+    },
+    {
+      "day": 1,
+      "hour_of_day": 21,
+      "minute_of_hour": 55,
+      "not_use_power": 113.83212280273438,
+      "step": 44,
+      "timestamp": "2025-07-25T21:55:00",
+      "total_active_power": 92.69829559326172
+    },
+    {
+      "day": 1,
+      "hour_of_day": 22,
+      "minute_of_hour": 10,
+      "not_use_power": 113.90324401855469,
+      "step": 45,
+      "timestamp": "2025-07-25T22:10:00",
+      "total_active_power": 92.75028228759766
+    },
+    {
+      "day": 1,
+      "hour_of_day": 22,
+      "minute_of_hour": 25,
+      "not_use_power": 113.97048950195312,
+      "step": 46,
+      "timestamp": "2025-07-25T22:25:00",
+      "total_active_power": 92.7992935180664
+    },
+    {
+      "day": 1,
+      "hour_of_day": 22,
+      "minute_of_hour": 40,
+      "not_use_power": 114.03411865234375,
+      "step": 47,
+      "timestamp": "2025-07-25T22:40:00",
+      "total_active_power": 92.84557342529297
+    },
+    {
+      "day": 1,
+      "hour_of_day": 22,
+      "minute_of_hour": 55,
+      "not_use_power": 114.09432983398438,
+      "step": 48,
+      "timestamp": "2025-07-25T22:55:00",
+      "total_active_power": 92.88932037353516
+    },
+    {
+      "day": 1,
+      "hour_of_day": 23,
+      "minute_of_hour": 10,
+      "not_use_power": 114.15130615234375,
+      "step": 49,
+      "timestamp": "2025-07-25T23:10:00",
+      "total_active_power": 92.9306411743164
+    },
+    {
+      "day": 1,
+      "hour_of_day": 23,
+      "minute_of_hour": 25,
+      "not_use_power": 114.20527648925781,
+      "step": 50,
+      "timestamp": "2025-07-25T23:25:00",
+      "total_active_power": 92.96973419189453
+    },
+    {
+      "day": 1,
+      "hour_of_day": 23,
+      "minute_of_hour": 40,
+      "not_use_power": 114.25636291503906,
+      "step": 51,
+      "timestamp": "2025-07-25T23:40:00",
+      "total_active_power": 93.00670623779297
+    },
+    {
+      "day": 1,
+      "hour_of_day": 23,
+      "minute_of_hour": 55,
+      "not_use_power": 114.30473327636719,
+      "step": 52,
+      "timestamp": "2025-07-25T23:55:00",
+      "total_active_power": 93.04170989990234
+    },
+    {
+      "day": 1,
+      "hour_of_day": 0,
+      "minute_of_hour": 10,
+      "not_use_power": 114.35057067871094,
+      "step": 53,
+      "timestamp": "2025-07-26T00:10:00",
+      "total_active_power": 93.07483673095703
+    },
+    {
+      "day": 1,
+      "hour_of_day": 0,
+      "minute_of_hour": 25,
+      "not_use_power": 114.39390563964844,
+      "step": 54,
+      "timestamp": "2025-07-26T00:25:00",
+      "total_active_power": 93.10619354248047
+    },
+    {
+      "day": 1,
+      "hour_of_day": 0,
+      "minute_of_hour": 40,
+      "not_use_power": 114.43504333496094,
+      "step": 55,
+      "timestamp": "2025-07-26T00:40:00",
+      "total_active_power": 93.13591766357422
+    },
+    {
+      "day": 1,
+      "hour_of_day": 0,
+      "minute_of_hour": 55,
+      "not_use_power": 114.47396850585938,
+      "step": 56,
+      "timestamp": "2025-07-26T00:55:00",
+      "total_active_power": 93.16405487060547
+    },
+    {
+      "day": 1,
+      "hour_of_day": 1,
+      "minute_of_hour": 10,
+      "not_use_power": 114.51083374023438,
+      "step": 57,
+      "timestamp": "2025-07-26T01:10:00",
+      "total_active_power": 93.19072723388672
+    },
+    {
+      "day": 1,
+      "hour_of_day": 1,
+      "minute_of_hour": 25,
+      "not_use_power": 114.54576110839844,
+      "step": 58,
+      "timestamp": "2025-07-26T01:25:00",
+      "total_active_power": 93.2159652709961
+    },
+    {
+      "day": 1,
+      "hour_of_day": 1,
+      "minute_of_hour": 40,
+      "not_use_power": 114.57887268066406,
+      "step": 59,
+      "timestamp": "2025-07-26T01:40:00",
+      "total_active_power": 93.2398910522461
+    },
+    {
+      "day": 1,
+      "hour_of_day": 1,
+      "minute_of_hour": 55,
+      "not_use_power": 114.61018371582031,
+      "step": 60,
+      "timestamp": "2025-07-26T01:55:00",
+      "total_active_power": 93.26251983642578
+    },
+    {
+      "day": 1,
+      "hour_of_day": 2,
+      "minute_of_hour": 10,
+      "not_use_power": 114.639892578125,
+      "step": 61,
+      "timestamp": "2025-07-26T02:10:00",
+      "total_active_power": 93.28398895263672
+    },
+    {
+      "day": 1,
+      "hour_of_day": 2,
+      "minute_of_hour": 25,
+      "not_use_power": 114.66802978515625,
+      "step": 62,
+      "timestamp": "2025-07-26T02:25:00",
+      "total_active_power": 93.30431365966797
+    },
+    {
+      "day": 1,
+      "hour_of_day": 2,
+      "minute_of_hour": 40,
+      "not_use_power": 114.6947021484375,
+      "step": 63,
+      "timestamp": "2025-07-26T02:40:00",
+      "total_active_power": 93.3235855102539
+    },
+    {
+      "day": 1,
+      "hour_of_day": 2,
+      "minute_of_hour": 55,
+      "not_use_power": 114.71995544433594,
+      "step": 64,
+      "timestamp": "2025-07-26T02:55:00",
+      "total_active_power": 93.34180450439453
+    },
+    {
+      "day": 1,
+      "hour_of_day": 3,
+      "minute_of_hour": 10,
+      "not_use_power": 114.74386596679688,
+      "step": 65,
+      "timestamp": "2025-07-26T03:10:00",
+      "total_active_power": 93.35907745361328
+    },
+    {
+      "day": 1,
+      "hour_of_day": 3,
+      "minute_of_hour": 25,
+      "not_use_power": 114.76652526855469,
+      "step": 66,
+      "timestamp": "2025-07-26T03:25:00",
+      "total_active_power": 93.37545013427734
+    },
+    {
+      "day": 1,
+      "hour_of_day": 3,
+      "minute_of_hour": 40,
+      "not_use_power": 114.78800964355469,
+      "step": 67,
+      "timestamp": "2025-07-26T03:40:00",
+      "total_active_power": 93.39095306396484
+    },
+    {
+      "day": 1,
+      "hour_of_day": 3,
+      "minute_of_hour": 55,
+      "not_use_power": 114.80841064453125,
+      "step": 68,
+      "timestamp": "2025-07-26T03:55:00",
+      "total_active_power": 93.40560150146484
+    },
+    {
+      "day": 1,
+      "hour_of_day": 4,
+      "minute_of_hour": 10,
+      "not_use_power": 114.82769775390625,
+      "step": 69,
+      "timestamp": "2025-07-26T04:10:00",
+      "total_active_power": 93.41947174072266
+    },
+    {
+      "day": 1,
+      "hour_of_day": 4,
+      "minute_of_hour": 25,
+      "not_use_power": 114.84597778320312,
+      "step": 70,
+      "timestamp": "2025-07-26T04:25:00",
+      "total_active_power": 93.43257904052734
+    },
+    {
+      "day": 1,
+      "hour_of_day": 4,
+      "minute_of_hour": 40,
+      "not_use_power": 114.86331176757812,
+      "step": 71,
+      "timestamp": "2025-07-26T04:40:00",
+      "total_active_power": 93.4450454711914
+    },
+    {
+      "day": 1,
+      "hour_of_day": 4,
+      "minute_of_hour": 55,
+      "not_use_power": 114.87971496582031,
+      "step": 72,
+      "timestamp": "2025-07-26T04:55:00",
+      "total_active_power": 93.45684051513672
+    },
+    {
+      "day": 1,
+      "hour_of_day": 5,
+      "minute_of_hour": 10,
+      "not_use_power": 114.895263671875,
+      "step": 73,
+      "timestamp": "2025-07-26T05:10:00",
+      "total_active_power": 93.46797943115234
+    },
+    {
+      "day": 1,
+      "hour_of_day": 5,
+      "minute_of_hour": 25,
+      "not_use_power": 114.9100341796875,
+      "step": 74,
+      "timestamp": "2025-07-26T05:25:00",
+      "total_active_power": 93.47855377197266
+    },
+    {
+      "day": 1,
+      "hour_of_day": 5,
+      "minute_of_hour": 40,
+      "not_use_power": 114.92399597167969,
+      "step": 75,
+      "timestamp": "2025-07-26T05:40:00",
+      "total_active_power": 93.48859405517578
+    },
+    {
+      "day": 1,
+      "hour_of_day": 5,
+      "minute_of_hour": 55,
+      "not_use_power": 114.93722534179688,
+      "step": 76,
+      "timestamp": "2025-07-26T05:55:00",
+      "total_active_power": 93.49808502197266
+    },
+    {
+      "day": 1,
+      "hour_of_day": 6,
+      "minute_of_hour": 10,
+      "not_use_power": 114.94975280761719,
+      "step": 77,
+      "timestamp": "2025-07-26T06:10:00",
+      "total_active_power": 93.5070571899414
+    },
+    {
+      "day": 1,
+      "hour_of_day": 6,
+      "minute_of_hour": 25,
+      "not_use_power": 114.96163940429688,
+      "step": 78,
+      "timestamp": "2025-07-26T06:25:00",
+      "total_active_power": 93.51563262939453
+    },
+    {
+      "day": 1,
+      "hour_of_day": 6,
+      "minute_of_hour": 40,
+      "not_use_power": 114.97293090820312,
+      "step": 79,
+      "timestamp": "2025-07-26T06:40:00",
+      "total_active_power": 93.52373504638672
+    },
+    {
+      "day": 1,
+      "hour_of_day": 6,
+      "minute_of_hour": 55,
+      "not_use_power": 114.98358154296875,
+      "step": 80,
+      "timestamp": "2025-07-26T06:55:00",
+      "total_active_power": 93.5313949584961
+    },
+    {
+      "day": 1,
+      "hour_of_day": 7,
+      "minute_of_hour": 10,
+      "not_use_power": 114.99369812011719,
+      "step": 81,
+      "timestamp": "2025-07-26T07:10:00",
+      "total_active_power": 93.5386734008789
+    },
+    {
+      "day": 1,
+      "hour_of_day": 7,
+      "minute_of_hour": 25,
+      "not_use_power": 115.00326538085938,
+      "step": 82,
+      "timestamp": "2025-07-26T07:25:00",
+      "total_active_power": 93.5455093383789
+    },
+    {
+      "day": 1,
+      "hour_of_day": 7,
+      "minute_of_hour": 40,
+      "not_use_power": 115.01237487792969,
+      "step": 83,
+      "timestamp": "2025-07-26T07:40:00",
+      "total_active_power": 93.55205535888672
+    },
+    {
+      "day": 1,
+      "hour_of_day": 7,
+      "minute_of_hour": 55,
+      "not_use_power": 115.02099609375,
+      "step": 84,
+      "timestamp": "2025-07-26T07:55:00",
+      "total_active_power": 93.5582504272461
+    },
+    {
+      "day": 1,
+      "hour_of_day": 8,
+      "minute_of_hour": 10,
+      "not_use_power": 115.02915954589844,
+      "step": 85,
+      "timestamp": "2025-07-26T08:10:00",
+      "total_active_power": 93.56407928466797
+    },
+    {
+      "day": 1,
+      "hour_of_day": 8,
+      "minute_of_hour": 25,
+      "not_use_power": 115.03689575195312,
+      "step": 86,
+      "timestamp": "2025-07-26T08:25:00",
+      "total_active_power": 93.56964874267578
+    },
+    {
+      "day": 1,
+      "hour_of_day": 8,
+      "minute_of_hour": 40,
+      "not_use_power": 115.04421997070312,
+      "step": 87,
+      "timestamp": "2025-07-26T08:40:00",
+      "total_active_power": 93.57489776611328
+    },
+    {
+      "day": 1,
+      "hour_of_day": 8,
+      "minute_of_hour": 55,
+      "not_use_power": 115.05117797851562,
+      "step": 88,
+      "timestamp": "2025-07-26T08:55:00",
+      "total_active_power": 93.57987213134766
+    },
+    {
+      "day": 1,
+      "hour_of_day": 9,
+      "minute_of_hour": 10,
+      "not_use_power": 115.0577392578125,
+      "step": 89,
+      "timestamp": "2025-07-26T09:10:00",
+      "total_active_power": 93.5846176147461
+    },
+    {
+      "day": 1,
+      "hour_of_day": 9,
+      "minute_of_hour": 25,
+      "not_use_power": 115.06401062011719,
+      "step": 90,
+      "timestamp": "2025-07-26T09:25:00",
+      "total_active_power": 93.58905792236328
+    },
+    {
+      "day": 1,
+      "hour_of_day": 9,
+      "minute_of_hour": 40,
+      "not_use_power": 115.06993103027344,
+      "step": 91,
+      "timestamp": "2025-07-26T09:40:00",
+      "total_active_power": 93.59326934814453
+    },
+    {
+      "day": 1,
+      "hour_of_day": 9,
+      "minute_of_hour": 55,
+      "not_use_power": 115.07551574707031,
+      "step": 92,
+      "timestamp": "2025-07-26T09:55:00",
+      "total_active_power": 93.59729766845703
+    },
+    {
+      "day": 1,
+      "hour_of_day": 10,
+      "minute_of_hour": 10,
+      "not_use_power": 115.08084106445312,
+      "step": 93,
+      "timestamp": "2025-07-26T10:10:00",
+      "total_active_power": 93.60115814208984
+    },
+    {
+      "day": 1,
+      "hour_of_day": 10,
+      "minute_of_hour": 25,
+      "not_use_power": 115.08590698242188,
+      "step": 94,
+      "timestamp": "2025-07-26T10:25:00",
+      "total_active_power": 93.60474395751953
+    },
+    {
+      "day": 1,
+      "hour_of_day": 10,
+      "minute_of_hour": 40,
+      "not_use_power": 115.09065246582031,
+      "step": 95,
+      "timestamp": "2025-07-26T10:40:00",
+      "total_active_power": 93.6081771850586
+    },
+    {
+      "day": 1,
+      "hour_of_day": 10,
+      "minute_of_hour": 55,
+      "not_use_power": 115.09519958496094,
+      "step": 96,
+      "timestamp": "2025-07-26T10:55:00",
+      "total_active_power": 93.61144256591797
+    },
+    {
+      "day": 2,
+      "hour_of_day": 11,
+      "minute_of_hour": 10,
+      "not_use_power": 115.0994873046875,
+      "step": 97,
+      "timestamp": "2025-07-26T11:10:00",
+      "total_active_power": 93.6145248413086
+    },
+    {
+      "day": 2,
+      "hour_of_day": 11,
+      "minute_of_hour": 25,
+      "not_use_power": 115.10354614257812,
+      "step": 98,
+      "timestamp": "2025-07-26T11:25:00",
+      "total_active_power": 93.61743927001953
+    },
+    {
+      "day": 2,
+      "hour_of_day": 11,
+      "minute_of_hour": 40,
+      "not_use_power": 115.10737609863281,
+      "step": 99,
+      "timestamp": "2025-07-26T11:40:00",
+      "total_active_power": 93.62017059326172
+    },
+    {
+      "day": 2,
+      "hour_of_day": 11,
+      "minute_of_hour": 55,
+      "not_use_power": 115.11103820800781,
+      "step": 100,
+      "timestamp": "2025-07-26T11:55:00",
+      "total_active_power": 93.62281036376953
+    },
+    {
+      "day": 2,
+      "hour_of_day": 12,
+      "minute_of_hour": 10,
+      "not_use_power": 115.114501953125,
+      "step": 101,
+      "timestamp": "2025-07-26T12:10:00",
+      "total_active_power": 93.62528228759766
+    },
+    {
+      "day": 2,
+      "hour_of_day": 12,
+      "minute_of_hour": 25,
+      "not_use_power": 115.11781311035156,
+      "step": 102,
+      "timestamp": "2025-07-26T12:25:00",
+      "total_active_power": 93.62764739990234
+    },
+    {
+      "day": 2,
+      "hour_of_day": 12,
+      "minute_of_hour": 40,
+      "not_use_power": 115.12091064453125,
+      "step": 103,
+      "timestamp": "2025-07-26T12:40:00",
+      "total_active_power": 93.62989044189453
+    },
+    {
+      "day": 2,
+      "hour_of_day": 12,
+      "minute_of_hour": 55,
+      "not_use_power": 115.12384033203125,
+      "step": 104,
+      "timestamp": "2025-07-26T12:55:00",
+      "total_active_power": 93.63196563720703
+    },
+    {
+      "day": 2,
+      "hour_of_day": 13,
+      "minute_of_hour": 10,
+      "not_use_power": 115.12664794921875,
+      "step": 105,
+      "timestamp": "2025-07-26T13:10:00",
+      "total_active_power": 93.63397979736328
+    },
+    {
+      "day": 2,
+      "hour_of_day": 13,
+      "minute_of_hour": 25,
+      "not_use_power": 115.12928771972656,
+      "step": 106,
+      "timestamp": "2025-07-26T13:25:00",
+      "total_active_power": 93.6358871459961
+    },
+    {
+      "day": 2,
+      "hour_of_day": 13,
+      "minute_of_hour": 40,
+      "not_use_power": 115.13179016113281,
+      "step": 107,
+      "timestamp": "2025-07-26T13:40:00",
+      "total_active_power": 93.6376724243164
+    },
+    {
+      "day": 2,
+      "hour_of_day": 13,
+      "minute_of_hour": 55,
+      "not_use_power": 115.13417053222656,
+      "step": 108,
+      "timestamp": "2025-07-26T13:55:00",
+      "total_active_power": 93.6393814086914
+    },
+    {
+      "day": 2,
+      "hour_of_day": 14,
+      "minute_of_hour": 10,
+      "not_use_power": 115.13639831542969,
+      "step": 109,
+      "timestamp": "2025-07-26T14:10:00",
+      "total_active_power": 93.6409683227539
+    },
+    {
+      "day": 2,
+      "hour_of_day": 14,
+      "minute_of_hour": 25,
+      "not_use_power": 115.13853454589844,
+      "step": 110,
+      "timestamp": "2025-07-26T14:25:00",
+      "total_active_power": 93.6424789428711
+    },
+    {
+      "day": 2,
+      "hour_of_day": 14,
+      "minute_of_hour": 40,
+      "not_use_power": 115.14059448242188,
+      "step": 111,
+      "timestamp": "2025-07-26T14:40:00",
+      "total_active_power": 93.64398956298828
+    },
+    {
+      "day": 2,
+      "hour_of_day": 14,
+      "minute_of_hour": 55,
+      "not_use_power": 115.14250183105469,
+      "step": 112,
+      "timestamp": "2025-07-26T14:55:00",
+      "total_active_power": 93.64534759521484
+    },
+    {
+      "day": 2,
+      "hour_of_day": 15,
+      "minute_of_hour": 10,
+      "not_use_power": 115.14431762695312,
+      "step": 113,
+      "timestamp": "2025-07-26T15:10:00",
+      "total_active_power": 93.64669036865234
+    },
+    {
+      "day": 2,
+      "hour_of_day": 15,
+      "minute_of_hour": 25,
+      "not_use_power": 115.14604187011719,
+      "step": 114,
+      "timestamp": "2025-07-26T15:25:00",
+      "total_active_power": 93.64791107177734
+    },
+    {
+      "day": 2,
+      "hour_of_day": 15,
+      "minute_of_hour": 40,
+      "not_use_power": 115.14767456054688,
+      "step": 115,
+      "timestamp": "2025-07-26T15:40:00",
+      "total_active_power": 93.64905548095703
+    },
+    {
+      "day": 2,
+      "hour_of_day": 15,
+      "minute_of_hour": 55,
+      "not_use_power": 115.14923095703125,
+      "step": 116,
+      "timestamp": "2025-07-26T15:55:00",
+      "total_active_power": 93.65018463134766
+    },
+    {
+      "day": 2,
+      "hour_of_day": 16,
+      "minute_of_hour": 10,
+      "not_use_power": 115.15069580078125,
+      "step": 117,
+      "timestamp": "2025-07-26T16:10:00",
+      "total_active_power": 93.65120697021484
+    },
+    {
+      "day": 2,
+      "hour_of_day": 16,
+      "minute_of_hour": 25,
+      "not_use_power": 115.15208435058594,
+      "step": 118,
+      "timestamp": "2025-07-26T16:25:00",
+      "total_active_power": 93.6521987915039
+    },
+    {
+      "day": 2,
+      "hour_of_day": 16,
+      "minute_of_hour": 40,
+      "not_use_power": 115.15339660644531,
+      "step": 119,
+      "timestamp": "2025-07-26T16:40:00",
+      "total_active_power": 93.65316009521484
+    },
+    {
+      "day": 2,
+      "hour_of_day": 16,
+      "minute_of_hour": 55,
+      "not_use_power": 115.15464782714844,
+      "step": 120,
+      "timestamp": "2025-07-26T16:55:00",
+      "total_active_power": 93.6540756225586
+    },
+    {
+      "day": 2,
+      "hour_of_day": 17,
+      "minute_of_hour": 10,
+      "not_use_power": 115.15583801269531,
+      "step": 121,
+      "timestamp": "2025-07-26T17:10:00",
+      "total_active_power": 93.6548843383789
+    },
+    {
+      "day": 2,
+      "hour_of_day": 17,
+      "minute_of_hour": 25,
+      "not_use_power": 115.156982421875,
+      "step": 122,
+      "timestamp": "2025-07-26T17:25:00",
+      "total_active_power": 93.65572357177734
+    },
+    {
+      "day": 2,
+      "hour_of_day": 17,
+      "minute_of_hour": 40,
+      "not_use_power": 115.15802001953125,
+      "step": 123,
+      "timestamp": "2025-07-26T17:40:00",
+      "total_active_power": 93.65644073486328
+    },
+    {
+      "day": 2,
+      "hour_of_day": 17,
+      "minute_of_hour": 55,
+      "not_use_power": 115.15904235839844,
+      "step": 124,
+      "timestamp": "2025-07-26T17:55:00",
+      "total_active_power": 93.6572036743164
+    },
+    {
+      "day": 2,
+      "hour_of_day": 18,
+      "minute_of_hour": 10,
+      "not_use_power": 115.15997314453125,
+      "step": 125,
+      "timestamp": "2025-07-26T18:10:00",
+      "total_active_power": 93.6578598022461
+    },
+    {
+      "day": 2,
+      "hour_of_day": 18,
+      "minute_of_hour": 25,
+      "not_use_power": 115.16091918945312,
+      "step": 126,
+      "timestamp": "2025-07-26T18:25:00",
+      "total_active_power": 93.65856170654297
+    },
+    {
+      "day": 2,
+      "hour_of_day": 18,
+      "minute_of_hour": 40,
+      "not_use_power": 115.16175842285156,
+      "step": 127,
+      "timestamp": "2025-07-26T18:40:00",
+      "total_active_power": 93.6591567993164
+    },
+    {
+      "day": 2,
+      "hour_of_day": 18,
+      "minute_of_hour": 55,
+      "not_use_power": 115.16256713867188,
+      "step": 128,
+      "timestamp": "2025-07-26T18:55:00",
+      "total_active_power": 93.65973663330078
+    },
+    {
+      "day": 2,
+      "hour_of_day": 19,
+      "minute_of_hour": 10,
+      "not_use_power": 115.163330078125,
+      "step": 129,
+      "timestamp": "2025-07-26T19:10:00",
+      "total_active_power": 93.66027069091797
+    },
+    {
+      "day": 2,
+      "hour_of_day": 19,
+      "minute_of_hour": 25,
+      "not_use_power": 115.16412353515625,
+      "step": 130,
+      "timestamp": "2025-07-26T19:25:00",
+      "total_active_power": 93.66082000732422
+    },
+    {
+      "day": 2,
+      "hour_of_day": 19,
+      "minute_of_hour": 40,
+      "not_use_power": 115.16477966308594,
+      "step": 131,
+      "timestamp": "2025-07-26T19:40:00",
+      "total_active_power": 93.66132354736328
+    },
+    {
+      "day": 2,
+      "hour_of_day": 19,
+      "minute_of_hour": 55,
+      "not_use_power": 115.16542053222656,
+      "step": 132,
+      "timestamp": "2025-07-26T19:55:00",
+      "total_active_power": 93.66175079345703
+    },
+    {
+      "day": 2,
+      "hour_of_day": 20,
+      "minute_of_hour": 10,
+      "not_use_power": 115.16606140136719,
+      "step": 133,
+      "timestamp": "2025-07-26T20:10:00",
+      "total_active_power": 93.6622543334961
+    },
+    {
+      "day": 2,
+      "hour_of_day": 20,
+      "minute_of_hour": 25,
+      "not_use_power": 115.16665649414062,
+      "step": 134,
+      "timestamp": "2025-07-26T20:25:00",
+      "total_active_power": 93.66265106201172
+    },
+    {
+      "day": 2,
+      "hour_of_day": 20,
+      "minute_of_hour": 40,
+      "not_use_power": 115.16722106933594,
+      "step": 135,
+      "timestamp": "2025-07-26T20:40:00",
+      "total_active_power": 93.66309356689453
+    },
+    {
+      "day": 2,
+      "hour_of_day": 20,
+      "minute_of_hour": 55,
+      "not_use_power": 115.16775512695312,
+      "step": 136,
+      "timestamp": "2025-07-26T20:55:00",
+      "total_active_power": 93.66345977783203
+    },
+    {
+      "day": 2,
+      "hour_of_day": 21,
+      "minute_of_hour": 10,
+      "not_use_power": 115.16825866699219,
+      "step": 137,
+      "timestamp": "2025-07-26T21:10:00",
+      "total_active_power": 93.6637954711914
+    },
+    {
+      "day": 2,
+      "hour_of_day": 21,
+      "minute_of_hour": 25,
+      "not_use_power": 115.16873168945312,
+      "step": 138,
+      "timestamp": "2025-07-26T21:25:00",
+      "total_active_power": 93.66414642333984
+    },
+    {
+      "day": 2,
+      "hour_of_day": 21,
+      "minute_of_hour": 40,
+      "not_use_power": 115.16917419433594,
+      "step": 139,
+      "timestamp": "2025-07-26T21:40:00",
+      "total_active_power": 93.66448211669922
+    },
+    {
+      "day": 2,
+      "hour_of_day": 21,
+      "minute_of_hour": 55,
+      "not_use_power": 115.16960144042969,
+      "step": 140,
+      "timestamp": "2025-07-26T21:55:00",
+      "total_active_power": 93.6647720336914
+    },
+    {
+      "day": 2,
+      "hour_of_day": 22,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17001342773438,
+      "step": 141,
+      "timestamp": "2025-07-26T22:10:00",
+      "total_active_power": 93.66507720947266
+    },
+    {
+      "day": 2,
+      "hour_of_day": 22,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17044067382812,
+      "step": 142,
+      "timestamp": "2025-07-26T22:25:00",
+      "total_active_power": 93.66536712646484
+    },
+    {
+      "day": 2,
+      "hour_of_day": 22,
+      "minute_of_hour": 40,
+      "not_use_power": 115.1707763671875,
+      "step": 143,
+      "timestamp": "2025-07-26T22:40:00",
+      "total_active_power": 93.6656265258789
+    },
+    {
+      "day": 2,
+      "hour_of_day": 22,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17109680175781,
+      "step": 144,
+      "timestamp": "2025-07-26T22:55:00",
+      "total_active_power": 93.66584014892578
+    },
+    {
+      "day": 2,
+      "hour_of_day": 23,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17141723632812,
+      "step": 145,
+      "timestamp": "2025-07-26T23:10:00",
+      "total_active_power": 93.66613006591797
+    },
+    {
+      "day": 2,
+      "hour_of_day": 23,
+      "minute_of_hour": 25,
+      "not_use_power": 115.1717529296875,
+      "step": 146,
+      "timestamp": "2025-07-26T23:25:00",
+      "total_active_power": 93.66632843017578
+    },
+    {
+      "day": 2,
+      "hour_of_day": 23,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17205810546875,
+      "step": 147,
+      "timestamp": "2025-07-26T23:40:00",
+      "total_active_power": 93.66655731201172
+    },
+    {
+      "day": 2,
+      "hour_of_day": 23,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17234802246094,
+      "step": 148,
+      "timestamp": "2025-07-26T23:55:00",
+      "total_active_power": 93.6667251586914
+    },
+    {
+      "day": 2,
+      "hour_of_day": 0,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17262268066406,
+      "step": 149,
+      "timestamp": "2025-07-27T00:10:00",
+      "total_active_power": 93.66692352294922
+    },
+    {
+      "day": 2,
+      "hour_of_day": 0,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17286682128906,
+      "step": 150,
+      "timestamp": "2025-07-27T00:25:00",
+      "total_active_power": 93.6670913696289
+    },
+    {
+      "day": 2,
+      "hour_of_day": 0,
+      "minute_of_hour": 40,
+      "not_use_power": 115.173095703125,
+      "step": 151,
+      "timestamp": "2025-07-27T00:40:00",
+      "total_active_power": 93.66727447509766
+    },
+    {
+      "day": 2,
+      "hour_of_day": 0,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17332458496094,
+      "step": 152,
+      "timestamp": "2025-07-27T00:55:00",
+      "total_active_power": 93.6674575805664
+    },
+    {
+      "day": 2,
+      "hour_of_day": 1,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17355346679688,
+      "step": 153,
+      "timestamp": "2025-07-27T01:10:00",
+      "total_active_power": 93.66764068603516
+    },
+    {
+      "day": 2,
+      "hour_of_day": 1,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17373657226562,
+      "step": 154,
+      "timestamp": "2025-07-27T01:25:00",
+      "total_active_power": 93.66773223876953
+    },
+    {
+      "day": 2,
+      "hour_of_day": 1,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17393493652344,
+      "step": 155,
+      "timestamp": "2025-07-27T01:40:00",
+      "total_active_power": 93.6678695678711
+    },
+    {
+      "day": 2,
+      "hour_of_day": 1,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17410278320312,
+      "step": 156,
+      "timestamp": "2025-07-27T01:55:00",
+      "total_active_power": 93.6679916381836
+    },
+    {
+      "day": 2,
+      "hour_of_day": 2,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17428588867188,
+      "step": 157,
+      "timestamp": "2025-07-27T02:10:00",
+      "total_active_power": 93.66812896728516
+    },
+    {
+      "day": 2,
+      "hour_of_day": 2,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17446899414062,
+      "step": 158,
+      "timestamp": "2025-07-27T02:25:00",
+      "total_active_power": 93.66820526123047
+    },
+    {
+      "day": 2,
+      "hour_of_day": 2,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17460632324219,
+      "step": 159,
+      "timestamp": "2025-07-27T02:40:00",
+      "total_active_power": 93.66832733154297
+    },
+    {
+      "day": 2,
+      "hour_of_day": 2,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17472839355469,
+      "step": 160,
+      "timestamp": "2025-07-27T02:55:00",
+      "total_active_power": 93.66840362548828
+    },
+    {
+      "day": 2,
+      "hour_of_day": 3,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17489624023438,
+      "step": 161,
+      "timestamp": "2025-07-27T03:10:00",
+      "total_active_power": 93.66854095458984
+    },
+    {
+      "day": 2,
+      "hour_of_day": 3,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17501831054688,
+      "step": 162,
+      "timestamp": "2025-07-27T03:25:00",
+      "total_active_power": 93.66863250732422
+    },
+    {
+      "day": 2,
+      "hour_of_day": 3,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17515563964844,
+      "step": 163,
+      "timestamp": "2025-07-27T03:40:00",
+      "total_active_power": 93.6687240600586
+    },
+    {
+      "day": 2,
+      "hour_of_day": 3,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17524719238281,
+      "step": 164,
+      "timestamp": "2025-07-27T03:55:00",
+      "total_active_power": 93.6688003540039
+    },
+    {
+      "day": 2,
+      "hour_of_day": 4,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17538452148438,
+      "step": 165,
+      "timestamp": "2025-07-27T04:10:00",
+      "total_active_power": 93.66886138916016
+    },
+    {
+      "day": 2,
+      "hour_of_day": 4,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17549133300781,
+      "step": 166,
+      "timestamp": "2025-07-27T04:25:00",
+      "total_active_power": 93.6689682006836
+    },
+    {
+      "day": 2,
+      "hour_of_day": 4,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17558288574219,
+      "step": 167,
+      "timestamp": "2025-07-27T04:40:00",
+      "total_active_power": 93.66902923583984
+    },
+    {
+      "day": 2,
+      "hour_of_day": 4,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17567443847656,
+      "step": 168,
+      "timestamp": "2025-07-27T04:55:00",
+      "total_active_power": 93.66912078857422
+    },
+    {
+      "day": 2,
+      "hour_of_day": 5,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17579650878906,
+      "step": 169,
+      "timestamp": "2025-07-27T05:10:00",
+      "total_active_power": 93.66918182373047
+    },
+    {
+      "day": 2,
+      "hour_of_day": 5,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17587280273438,
+      "step": 170,
+      "timestamp": "2025-07-27T05:25:00",
+      "total_active_power": 93.66925811767578
+    },
+    {
+      "day": 2,
+      "hour_of_day": 5,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17594909667969,
+      "step": 171,
+      "timestamp": "2025-07-27T05:40:00",
+      "total_active_power": 93.66930389404297
+    },
+    {
+      "day": 2,
+      "hour_of_day": 5,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17604064941406,
+      "step": 172,
+      "timestamp": "2025-07-27T05:55:00",
+      "total_active_power": 93.66936492919922
+    },
+    {
+      "day": 2,
+      "hour_of_day": 6,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17611694335938,
+      "step": 173,
+      "timestamp": "2025-07-27T06:10:00",
+      "total_active_power": 93.66942596435547
+    },
+    {
+      "day": 2,
+      "hour_of_day": 6,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17617797851562,
+      "step": 174,
+      "timestamp": "2025-07-27T06:25:00",
+      "total_active_power": 93.66948699951172
+    },
+    {
+      "day": 2,
+      "hour_of_day": 6,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17622375488281,
+      "step": 175,
+      "timestamp": "2025-07-27T06:40:00",
+      "total_active_power": 93.66950225830078
+    },
+    {
+      "day": 2,
+      "hour_of_day": 6,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17628479003906,
+      "step": 176,
+      "timestamp": "2025-07-27T06:55:00",
+      "total_active_power": 93.66951751708984
+    },
+    {
+      "day": 2,
+      "hour_of_day": 7,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17634582519531,
+      "step": 177,
+      "timestamp": "2025-07-27T07:10:00",
+      "total_active_power": 93.66959381103516
+    },
+    {
+      "day": 2,
+      "hour_of_day": 7,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17637634277344,
+      "step": 178,
+      "timestamp": "2025-07-27T07:25:00",
+      "total_active_power": 93.66963958740234
+    },
+    {
+      "day": 2,
+      "hour_of_day": 7,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17643737792969,
+      "step": 179,
+      "timestamp": "2025-07-27T07:40:00",
+      "total_active_power": 93.66968536376953
+    },
+    {
+      "day": 2,
+      "hour_of_day": 7,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17649841308594,
+      "step": 180,
+      "timestamp": "2025-07-27T07:55:00",
+      "total_active_power": 93.66971588134766
+    },
+    {
+      "day": 2,
+      "hour_of_day": 8,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17655944824219,
+      "step": 181,
+      "timestamp": "2025-07-27T08:10:00",
+      "total_active_power": 93.66976165771484
+    },
+    {
+      "day": 2,
+      "hour_of_day": 8,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17660522460938,
+      "step": 182,
+      "timestamp": "2025-07-27T08:25:00",
+      "total_active_power": 93.66979217529297
+    },
+    {
+      "day": 2,
+      "hour_of_day": 8,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17665100097656,
+      "step": 183,
+      "timestamp": "2025-07-27T08:40:00",
+      "total_active_power": 93.6698226928711
+    },
+    {
+      "day": 2,
+      "hour_of_day": 8,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17668151855469,
+      "step": 184,
+      "timestamp": "2025-07-27T08:55:00",
+      "total_active_power": 93.66983795166016
+    },
+    {
+      "day": 2,
+      "hour_of_day": 9,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17672729492188,
+      "step": 185,
+      "timestamp": "2025-07-27T09:10:00",
+      "total_active_power": 93.66988372802734
+    },
+    {
+      "day": 2,
+      "hour_of_day": 9,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17674255371094,
+      "step": 186,
+      "timestamp": "2025-07-27T09:25:00",
+      "total_active_power": 93.6698989868164
+    },
+    {
+      "day": 2,
+      "hour_of_day": 9,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17678833007812,
+      "step": 187,
+      "timestamp": "2025-07-27T09:40:00",
+      "total_active_power": 93.66991424560547
+    },
+    {
+      "day": 2,
+      "hour_of_day": 9,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17680358886719,
+      "step": 188,
+      "timestamp": "2025-07-27T09:55:00",
+      "total_active_power": 93.6699447631836
+    },
+    {
+      "day": 2,
+      "hour_of_day": 10,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17683410644531,
+      "step": 189,
+      "timestamp": "2025-07-27T10:10:00",
+      "total_active_power": 93.66996002197266
+    },
+    {
+      "day": 2,
+      "hour_of_day": 10,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17686462402344,
+      "step": 190,
+      "timestamp": "2025-07-27T10:25:00",
+      "total_active_power": 93.66997528076172
+    },
+    {
+      "day": 2,
+      "hour_of_day": 10,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17692565917969,
+      "step": 191,
+      "timestamp": "2025-07-27T10:40:00",
+      "total_active_power": 93.66999053955078
+    },
+    {
+      "day": 2,
+      "hour_of_day": 10,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17695617675781,
+      "step": 192,
+      "timestamp": "2025-07-27T10:55:00",
+      "total_active_power": 93.67003631591797
+    },
+    {
+      "day": 3,
+      "hour_of_day": 11,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17697143554688,
+      "step": 193,
+      "timestamp": "2025-07-27T11:10:00",
+      "total_active_power": 93.6700210571289
+    },
+    {
+      "day": 3,
+      "hour_of_day": 11,
+      "minute_of_hour": 25,
+      "not_use_power": 115.177001953125,
+      "step": 194,
+      "timestamp": "2025-07-27T11:25:00",
+      "total_active_power": 93.67003631591797
+    },
+    {
+      "day": 3,
+      "hour_of_day": 11,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17701721191406,
+      "step": 195,
+      "timestamp": "2025-07-27T11:40:00",
+      "total_active_power": 93.67005157470703
+    },
+    {
+      "day": 3,
+      "hour_of_day": 11,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17703247070312,
+      "step": 196,
+      "timestamp": "2025-07-27T11:55:00",
+      "total_active_power": 93.67008209228516
+    },
+    {
+      "day": 3,
+      "hour_of_day": 12,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17706298828125,
+      "step": 197,
+      "timestamp": "2025-07-27T12:10:00",
+      "total_active_power": 93.67009735107422
+    },
+    {
+      "day": 3,
+      "hour_of_day": 12,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17707824707031,
+      "step": 198,
+      "timestamp": "2025-07-27T12:25:00",
+      "total_active_power": 93.67009735107422
+    },
+    {
+      "day": 3,
+      "hour_of_day": 12,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17709350585938,
+      "step": 199,
+      "timestamp": "2025-07-27T12:40:00",
+      "total_active_power": 93.67011260986328
+    },
+    {
+      "day": 3,
+      "hour_of_day": 12,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17709350585938,
+      "step": 200,
+      "timestamp": "2025-07-27T12:55:00",
+      "total_active_power": 93.67011260986328
+    },
+    {
+      "day": 3,
+      "hour_of_day": 13,
+      "minute_of_hour": 10,
+      "not_use_power": 115.1771240234375,
+      "step": 201,
+      "timestamp": "2025-07-27T13:10:00",
+      "total_active_power": 93.6701431274414
+    },
+    {
+      "day": 3,
+      "hour_of_day": 13,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17713928222656,
+      "step": 202,
+      "timestamp": "2025-07-27T13:25:00",
+      "total_active_power": 93.67015838623047
+    },
+    {
+      "day": 3,
+      "hour_of_day": 13,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17715454101562,
+      "step": 203,
+      "timestamp": "2025-07-27T13:40:00",
+      "total_active_power": 93.67015838623047
+    },
+    {
+      "day": 3,
+      "hour_of_day": 13,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17718505859375,
+      "step": 204,
+      "timestamp": "2025-07-27T13:55:00",
+      "total_active_power": 93.67017364501953
+    },
+    {
+      "day": 3,
+      "hour_of_day": 14,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17720031738281,
+      "step": 205,
+      "timestamp": "2025-07-27T14:10:00",
+      "total_active_power": 93.67017364501953
+    },
+    {
+      "day": 3,
+      "hour_of_day": 14,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17720031738281,
+      "step": 206,
+      "timestamp": "2025-07-27T14:25:00",
+      "total_active_power": 93.67017364501953
+    },
+    {
+      "day": 3,
+      "hour_of_day": 14,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17720031738281,
+      "step": 207,
+      "timestamp": "2025-07-27T14:40:00",
+      "total_active_power": 93.67017364501953
+    },
+    {
+      "day": 3,
+      "hour_of_day": 14,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17720031738281,
+      "step": 208,
+      "timestamp": "2025-07-27T14:55:00",
+      "total_active_power": 93.67021942138672
+    },
+    {
+      "day": 3,
+      "hour_of_day": 15,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17721557617188,
+      "step": 209,
+      "timestamp": "2025-07-27T15:10:00",
+      "total_active_power": 93.67024993896484
+    },
+    {
+      "day": 3,
+      "hour_of_day": 15,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17721557617188,
+      "step": 210,
+      "timestamp": "2025-07-27T15:25:00",
+      "total_active_power": 93.67024993896484
+    },
+    {
+      "day": 3,
+      "hour_of_day": 15,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17724609375,
+      "step": 211,
+      "timestamp": "2025-07-27T15:40:00",
+      "total_active_power": 93.67023468017578
+    },
+    {
+      "day": 3,
+      "hour_of_day": 15,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17724609375,
+      "step": 212,
+      "timestamp": "2025-07-27T15:55:00",
+      "total_active_power": 93.67023468017578
+    },
+    {
+      "day": 3,
+      "hour_of_day": 16,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17724609375,
+      "step": 213,
+      "timestamp": "2025-07-27T16:10:00",
+      "total_active_power": 93.67023468017578
+    },
+    {
+      "day": 3,
+      "hour_of_day": 16,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17726135253906,
+      "step": 214,
+      "timestamp": "2025-07-27T16:25:00",
+      "total_active_power": 93.67024993896484
+    },
+    {
+      "day": 3,
+      "hour_of_day": 16,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17726135253906,
+      "step": 215,
+      "timestamp": "2025-07-27T16:40:00",
+      "total_active_power": 93.67023468017578
+    },
+    {
+      "day": 3,
+      "hour_of_day": 16,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17726135253906,
+      "step": 216,
+      "timestamp": "2025-07-27T16:55:00",
+      "total_active_power": 93.67024993896484
+    },
+    {
+      "day": 3,
+      "hour_of_day": 17,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17727661132812,
+      "step": 217,
+      "timestamp": "2025-07-27T17:10:00",
+      "total_active_power": 93.67023468017578
+    },
+    {
+      "day": 3,
+      "hour_of_day": 17,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17727661132812,
+      "step": 218,
+      "timestamp": "2025-07-27T17:25:00",
+      "total_active_power": 93.67023468017578
+    },
+    {
+      "day": 3,
+      "hour_of_day": 17,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17727661132812,
+      "step": 219,
+      "timestamp": "2025-07-27T17:40:00",
+      "total_active_power": 93.67023468017578
+    },
+    {
+      "day": 3,
+      "hour_of_day": 17,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17727661132812,
+      "step": 220,
+      "timestamp": "2025-07-27T17:55:00",
+      "total_active_power": 93.67024993896484
+    },
+    {
+      "day": 3,
+      "hour_of_day": 18,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17727661132812,
+      "step": 221,
+      "timestamp": "2025-07-27T18:10:00",
+      "total_active_power": 93.67024993896484
+    },
+    {
+      "day": 3,
+      "hour_of_day": 18,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17730712890625,
+      "step": 222,
+      "timestamp": "2025-07-27T18:25:00",
+      "total_active_power": 93.67028045654297
+    },
+    {
+      "day": 3,
+      "hour_of_day": 18,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17730712890625,
+      "step": 223,
+      "timestamp": "2025-07-27T18:40:00",
+      "total_active_power": 93.67028045654297
+    },
+    {
+      "day": 3,
+      "hour_of_day": 18,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17730712890625,
+      "step": 224,
+      "timestamp": "2025-07-27T18:55:00",
+      "total_active_power": 93.67028045654297
+    },
+    {
+      "day": 3,
+      "hour_of_day": 19,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17732238769531,
+      "step": 225,
+      "timestamp": "2025-07-27T19:10:00",
+      "total_active_power": 93.67028045654297
+    },
+    {
+      "day": 3,
+      "hour_of_day": 19,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17732238769531,
+      "step": 226,
+      "timestamp": "2025-07-27T19:25:00",
+      "total_active_power": 93.67028045654297
+    },
+    {
+      "day": 3,
+      "hour_of_day": 19,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17732238769531,
+      "step": 227,
+      "timestamp": "2025-07-27T19:40:00",
+      "total_active_power": 93.67029571533203
+    },
+    {
+      "day": 3,
+      "hour_of_day": 19,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17732238769531,
+      "step": 228,
+      "timestamp": "2025-07-27T19:55:00",
+      "total_active_power": 93.67028045654297
+    },
+    {
+      "day": 3,
+      "hour_of_day": 20,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17732238769531,
+      "step": 229,
+      "timestamp": "2025-07-27T20:10:00",
+      "total_active_power": 93.67029571533203
+    },
+    {
+      "day": 3,
+      "hour_of_day": 20,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17733764648438,
+      "step": 230,
+      "timestamp": "2025-07-27T20:25:00",
+      "total_active_power": 93.67029571533203
+    },
+    {
+      "day": 3,
+      "hour_of_day": 20,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17733764648438,
+      "step": 231,
+      "timestamp": "2025-07-27T20:40:00",
+      "total_active_power": 93.67029571533203
+    },
+    {
+      "day": 3,
+      "hour_of_day": 20,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17733764648438,
+      "step": 232,
+      "timestamp": "2025-07-27T20:55:00",
+      "total_active_power": 93.67029571533203
+    },
+    {
+      "day": 3,
+      "hour_of_day": 21,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17733764648438,
+      "step": 233,
+      "timestamp": "2025-07-27T21:10:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 3,
+      "hour_of_day": 21,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17733764648438,
+      "step": 234,
+      "timestamp": "2025-07-27T21:25:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 3,
+      "hour_of_day": 21,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17733764648438,
+      "step": 235,
+      "timestamp": "2025-07-27T21:40:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 3,
+      "hour_of_day": 21,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17733764648438,
+      "step": 236,
+      "timestamp": "2025-07-27T21:55:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 3,
+      "hour_of_day": 22,
+      "minute_of_hour": 10,
+      "not_use_power": 115.1773681640625,
+      "step": 237,
+      "timestamp": "2025-07-27T22:10:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 3,
+      "hour_of_day": 22,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17733764648438,
+      "step": 238,
+      "timestamp": "2025-07-27T22:25:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 3,
+      "hour_of_day": 22,
+      "minute_of_hour": 40,
+      "not_use_power": 115.1773681640625,
+      "step": 239,
+      "timestamp": "2025-07-27T22:40:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 3,
+      "hour_of_day": 22,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17733764648438,
+      "step": 240,
+      "timestamp": "2025-07-27T22:55:00",
+      "total_active_power": 93.67029571533203
+    },
+    {
+      "day": 3,
+      "hour_of_day": 23,
+      "minute_of_hour": 10,
+      "not_use_power": 115.1773681640625,
+      "step": 241,
+      "timestamp": "2025-07-27T23:10:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 3,
+      "hour_of_day": 23,
+      "minute_of_hour": 25,
+      "not_use_power": 115.1773681640625,
+      "step": 242,
+      "timestamp": "2025-07-27T23:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 23,
+      "minute_of_hour": 40,
+      "not_use_power": 115.1773681640625,
+      "step": 243,
+      "timestamp": "2025-07-27T23:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 23,
+      "minute_of_hour": 55,
+      "not_use_power": 115.1773681640625,
+      "step": 244,
+      "timestamp": "2025-07-27T23:55:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 3,
+      "hour_of_day": 0,
+      "minute_of_hour": 10,
+      "not_use_power": 115.1773681640625,
+      "step": 245,
+      "timestamp": "2025-07-28T00:10:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 3,
+      "hour_of_day": 0,
+      "minute_of_hour": 25,
+      "not_use_power": 115.1773681640625,
+      "step": 246,
+      "timestamp": "2025-07-28T00:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 0,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17733764648438,
+      "step": 247,
+      "timestamp": "2025-07-28T00:40:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 3,
+      "hour_of_day": 0,
+      "minute_of_hour": 55,
+      "not_use_power": 115.1773681640625,
+      "step": 248,
+      "timestamp": "2025-07-28T00:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 1,
+      "minute_of_hour": 10,
+      "not_use_power": 115.1773681640625,
+      "step": 249,
+      "timestamp": "2025-07-28T01:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 1,
+      "minute_of_hour": 25,
+      "not_use_power": 115.1773681640625,
+      "step": 250,
+      "timestamp": "2025-07-28T01:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 1,
+      "minute_of_hour": 40,
+      "not_use_power": 115.1773681640625,
+      "step": 251,
+      "timestamp": "2025-07-28T01:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 1,
+      "minute_of_hour": 55,
+      "not_use_power": 115.1773681640625,
+      "step": 252,
+      "timestamp": "2025-07-28T01:55:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 3,
+      "hour_of_day": 2,
+      "minute_of_hour": 10,
+      "not_use_power": 115.1773681640625,
+      "step": 253,
+      "timestamp": "2025-07-28T02:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 2,
+      "minute_of_hour": 25,
+      "not_use_power": 115.1773681640625,
+      "step": 254,
+      "timestamp": "2025-07-28T02:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 2,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 255,
+      "timestamp": "2025-07-28T02:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 2,
+      "minute_of_hour": 55,
+      "not_use_power": 115.1773681640625,
+      "step": 256,
+      "timestamp": "2025-07-28T02:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 3,
+      "minute_of_hour": 10,
+      "not_use_power": 115.1773681640625,
+      "step": 257,
+      "timestamp": "2025-07-28T03:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 3,
+      "minute_of_hour": 25,
+      "not_use_power": 115.1773681640625,
+      "step": 258,
+      "timestamp": "2025-07-28T03:25:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 3,
+      "hour_of_day": 3,
+      "minute_of_hour": 40,
+      "not_use_power": 115.1773681640625,
+      "step": 259,
+      "timestamp": "2025-07-28T03:40:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 3,
+      "hour_of_day": 3,
+      "minute_of_hour": 55,
+      "not_use_power": 115.1773681640625,
+      "step": 260,
+      "timestamp": "2025-07-28T03:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 4,
+      "minute_of_hour": 10,
+      "not_use_power": 115.1773681640625,
+      "step": 261,
+      "timestamp": "2025-07-28T04:10:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 3,
+      "hour_of_day": 4,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17733764648438,
+      "step": 262,
+      "timestamp": "2025-07-28T04:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 4,
+      "minute_of_hour": 40,
+      "not_use_power": 115.1773681640625,
+      "step": 263,
+      "timestamp": "2025-07-28T04:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 4,
+      "minute_of_hour": 55,
+      "not_use_power": 115.1773681640625,
+      "step": 264,
+      "timestamp": "2025-07-28T04:55:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 3,
+      "hour_of_day": 5,
+      "minute_of_hour": 10,
+      "not_use_power": 115.1773681640625,
+      "step": 265,
+      "timestamp": "2025-07-28T05:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 5,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 266,
+      "timestamp": "2025-07-28T05:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 5,
+      "minute_of_hour": 40,
+      "not_use_power": 115.1773681640625,
+      "step": 267,
+      "timestamp": "2025-07-28T05:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 5,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 268,
+      "timestamp": "2025-07-28T05:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 6,
+      "minute_of_hour": 10,
+      "not_use_power": 115.1773681640625,
+      "step": 269,
+      "timestamp": "2025-07-28T06:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 6,
+      "minute_of_hour": 25,
+      "not_use_power": 115.1773681640625,
+      "step": 270,
+      "timestamp": "2025-07-28T06:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 6,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 271,
+      "timestamp": "2025-07-28T06:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 6,
+      "minute_of_hour": 55,
+      "not_use_power": 115.1773681640625,
+      "step": 272,
+      "timestamp": "2025-07-28T06:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 7,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 273,
+      "timestamp": "2025-07-28T07:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 7,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 274,
+      "timestamp": "2025-07-28T07:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 7,
+      "minute_of_hour": 40,
+      "not_use_power": 115.1773681640625,
+      "step": 275,
+      "timestamp": "2025-07-28T07:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 7,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 276,
+      "timestamp": "2025-07-28T07:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 8,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 277,
+      "timestamp": "2025-07-28T08:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 8,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 278,
+      "timestamp": "2025-07-28T08:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 8,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 279,
+      "timestamp": "2025-07-28T08:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 8,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 280,
+      "timestamp": "2025-07-28T08:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 9,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 281,
+      "timestamp": "2025-07-28T09:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 9,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 282,
+      "timestamp": "2025-07-28T09:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 9,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 283,
+      "timestamp": "2025-07-28T09:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 9,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 284,
+      "timestamp": "2025-07-28T09:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 10,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 285,
+      "timestamp": "2025-07-28T10:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 10,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 286,
+      "timestamp": "2025-07-28T10:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 10,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 287,
+      "timestamp": "2025-07-28T10:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 3,
+      "hour_of_day": 10,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 288,
+      "timestamp": "2025-07-28T10:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 11,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 289,
+      "timestamp": "2025-07-28T11:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 11,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 290,
+      "timestamp": "2025-07-28T11:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 11,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 291,
+      "timestamp": "2025-07-28T11:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 11,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 292,
+      "timestamp": "2025-07-28T11:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 12,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 293,
+      "timestamp": "2025-07-28T12:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 12,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 294,
+      "timestamp": "2025-07-28T12:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 12,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 295,
+      "timestamp": "2025-07-28T12:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 12,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 296,
+      "timestamp": "2025-07-28T12:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 13,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 297,
+      "timestamp": "2025-07-28T13:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 13,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 298,
+      "timestamp": "2025-07-28T13:25:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 4,
+      "hour_of_day": 13,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 299,
+      "timestamp": "2025-07-28T13:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 13,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 300,
+      "timestamp": "2025-07-28T13:55:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 4,
+      "hour_of_day": 14,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 301,
+      "timestamp": "2025-07-28T14:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 14,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 302,
+      "timestamp": "2025-07-28T14:25:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 4,
+      "hour_of_day": 14,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 303,
+      "timestamp": "2025-07-28T14:40:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 4,
+      "hour_of_day": 14,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 304,
+      "timestamp": "2025-07-28T14:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 15,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 305,
+      "timestamp": "2025-07-28T15:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 15,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 306,
+      "timestamp": "2025-07-28T15:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 15,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 307,
+      "timestamp": "2025-07-28T15:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 15,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 308,
+      "timestamp": "2025-07-28T15:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 16,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 309,
+      "timestamp": "2025-07-28T16:10:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 4,
+      "hour_of_day": 16,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 310,
+      "timestamp": "2025-07-28T16:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 16,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 311,
+      "timestamp": "2025-07-28T16:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 16,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 312,
+      "timestamp": "2025-07-28T16:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 17,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 313,
+      "timestamp": "2025-07-28T17:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 17,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 314,
+      "timestamp": "2025-07-28T17:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 17,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 315,
+      "timestamp": "2025-07-28T17:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 17,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 316,
+      "timestamp": "2025-07-28T17:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 18,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 317,
+      "timestamp": "2025-07-28T18:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 18,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 318,
+      "timestamp": "2025-07-28T18:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 18,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 319,
+      "timestamp": "2025-07-28T18:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 18,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 320,
+      "timestamp": "2025-07-28T18:55:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 4,
+      "hour_of_day": 19,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 321,
+      "timestamp": "2025-07-28T19:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 19,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 322,
+      "timestamp": "2025-07-28T19:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 19,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 323,
+      "timestamp": "2025-07-28T19:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 19,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 324,
+      "timestamp": "2025-07-28T19:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 20,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 325,
+      "timestamp": "2025-07-28T20:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 20,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 326,
+      "timestamp": "2025-07-28T20:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 20,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 327,
+      "timestamp": "2025-07-28T20:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 20,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 328,
+      "timestamp": "2025-07-28T20:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 21,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 329,
+      "timestamp": "2025-07-28T21:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 21,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 330,
+      "timestamp": "2025-07-28T21:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 21,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 331,
+      "timestamp": "2025-07-28T21:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 21,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 332,
+      "timestamp": "2025-07-28T21:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 22,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 333,
+      "timestamp": "2025-07-28T22:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 22,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 334,
+      "timestamp": "2025-07-28T22:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 22,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 335,
+      "timestamp": "2025-07-28T22:40:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 4,
+      "hour_of_day": 22,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 336,
+      "timestamp": "2025-07-28T22:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 23,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 337,
+      "timestamp": "2025-07-28T23:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 23,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 338,
+      "timestamp": "2025-07-28T23:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 23,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 339,
+      "timestamp": "2025-07-28T23:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 23,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 340,
+      "timestamp": "2025-07-28T23:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 0,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 341,
+      "timestamp": "2025-07-29T00:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 0,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 342,
+      "timestamp": "2025-07-29T00:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 0,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 343,
+      "timestamp": "2025-07-29T00:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 0,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 344,
+      "timestamp": "2025-07-29T00:55:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 4,
+      "hour_of_day": 1,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 345,
+      "timestamp": "2025-07-29T01:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 1,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 346,
+      "timestamp": "2025-07-29T01:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 1,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 347,
+      "timestamp": "2025-07-29T01:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 1,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 348,
+      "timestamp": "2025-07-29T01:55:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 4,
+      "hour_of_day": 2,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 349,
+      "timestamp": "2025-07-29T02:10:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 4,
+      "hour_of_day": 2,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 350,
+      "timestamp": "2025-07-29T02:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 2,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 351,
+      "timestamp": "2025-07-29T02:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 2,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 352,
+      "timestamp": "2025-07-29T02:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 3,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 353,
+      "timestamp": "2025-07-29T03:10:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 4,
+      "hour_of_day": 3,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 354,
+      "timestamp": "2025-07-29T03:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 3,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 355,
+      "timestamp": "2025-07-29T03:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 3,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 356,
+      "timestamp": "2025-07-29T03:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 4,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 357,
+      "timestamp": "2025-07-29T04:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 4,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 358,
+      "timestamp": "2025-07-29T04:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 4,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 359,
+      "timestamp": "2025-07-29T04:40:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 4,
+      "hour_of_day": 4,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 360,
+      "timestamp": "2025-07-29T04:55:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 4,
+      "hour_of_day": 5,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 361,
+      "timestamp": "2025-07-29T05:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 5,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 362,
+      "timestamp": "2025-07-29T05:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 5,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 363,
+      "timestamp": "2025-07-29T05:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 5,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 364,
+      "timestamp": "2025-07-29T05:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 6,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 365,
+      "timestamp": "2025-07-29T06:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 6,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 366,
+      "timestamp": "2025-07-29T06:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 6,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 367,
+      "timestamp": "2025-07-29T06:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 6,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 368,
+      "timestamp": "2025-07-29T06:55:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 4,
+      "hour_of_day": 7,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 369,
+      "timestamp": "2025-07-29T07:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 7,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 370,
+      "timestamp": "2025-07-29T07:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 7,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 371,
+      "timestamp": "2025-07-29T07:40:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 4,
+      "hour_of_day": 7,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 372,
+      "timestamp": "2025-07-29T07:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 8,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 373,
+      "timestamp": "2025-07-29T08:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 8,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 374,
+      "timestamp": "2025-07-29T08:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 8,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 375,
+      "timestamp": "2025-07-29T08:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 8,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 376,
+      "timestamp": "2025-07-29T08:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 9,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 377,
+      "timestamp": "2025-07-29T09:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 9,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 378,
+      "timestamp": "2025-07-29T09:25:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 4,
+      "hour_of_day": 9,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 379,
+      "timestamp": "2025-07-29T09:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 9,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 380,
+      "timestamp": "2025-07-29T09:55:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 4,
+      "hour_of_day": 10,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 381,
+      "timestamp": "2025-07-29T10:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 10,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 382,
+      "timestamp": "2025-07-29T10:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 10,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 383,
+      "timestamp": "2025-07-29T10:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 4,
+      "hour_of_day": 10,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 384,
+      "timestamp": "2025-07-29T10:55:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 5,
+      "hour_of_day": 11,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 385,
+      "timestamp": "2025-07-29T11:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 11,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 386,
+      "timestamp": "2025-07-29T11:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 11,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 387,
+      "timestamp": "2025-07-29T11:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 11,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 388,
+      "timestamp": "2025-07-29T11:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 12,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 389,
+      "timestamp": "2025-07-29T12:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 12,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 390,
+      "timestamp": "2025-07-29T12:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 12,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 391,
+      "timestamp": "2025-07-29T12:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 12,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 392,
+      "timestamp": "2025-07-29T12:55:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 5,
+      "hour_of_day": 13,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 393,
+      "timestamp": "2025-07-29T13:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 13,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 394,
+      "timestamp": "2025-07-29T13:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 13,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 395,
+      "timestamp": "2025-07-29T13:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 13,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 396,
+      "timestamp": "2025-07-29T13:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 14,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 397,
+      "timestamp": "2025-07-29T14:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 14,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 398,
+      "timestamp": "2025-07-29T14:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 14,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 399,
+      "timestamp": "2025-07-29T14:40:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 5,
+      "hour_of_day": 14,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 400,
+      "timestamp": "2025-07-29T14:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 15,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 401,
+      "timestamp": "2025-07-29T15:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 15,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 402,
+      "timestamp": "2025-07-29T15:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 15,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 403,
+      "timestamp": "2025-07-29T15:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 15,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 404,
+      "timestamp": "2025-07-29T15:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 16,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 405,
+      "timestamp": "2025-07-29T16:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 16,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 406,
+      "timestamp": "2025-07-29T16:25:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 5,
+      "hour_of_day": 16,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 407,
+      "timestamp": "2025-07-29T16:40:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 5,
+      "hour_of_day": 16,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 408,
+      "timestamp": "2025-07-29T16:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 17,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 409,
+      "timestamp": "2025-07-29T17:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 17,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 410,
+      "timestamp": "2025-07-29T17:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 17,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 411,
+      "timestamp": "2025-07-29T17:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 17,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 412,
+      "timestamp": "2025-07-29T17:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 18,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 413,
+      "timestamp": "2025-07-29T18:10:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 5,
+      "hour_of_day": 18,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 414,
+      "timestamp": "2025-07-29T18:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 18,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 415,
+      "timestamp": "2025-07-29T18:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 18,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 416,
+      "timestamp": "2025-07-29T18:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 19,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 417,
+      "timestamp": "2025-07-29T19:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 19,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 418,
+      "timestamp": "2025-07-29T19:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 19,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 419,
+      "timestamp": "2025-07-29T19:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 19,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 420,
+      "timestamp": "2025-07-29T19:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 20,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 421,
+      "timestamp": "2025-07-29T20:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 20,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 422,
+      "timestamp": "2025-07-29T20:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 20,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 423,
+      "timestamp": "2025-07-29T20:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 20,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 424,
+      "timestamp": "2025-07-29T20:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 21,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 425,
+      "timestamp": "2025-07-29T21:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 21,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 426,
+      "timestamp": "2025-07-29T21:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 21,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 427,
+      "timestamp": "2025-07-29T21:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 21,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 428,
+      "timestamp": "2025-07-29T21:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 22,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 429,
+      "timestamp": "2025-07-29T22:10:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 5,
+      "hour_of_day": 22,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 430,
+      "timestamp": "2025-07-29T22:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 22,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 431,
+      "timestamp": "2025-07-29T22:40:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 5,
+      "hour_of_day": 22,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 432,
+      "timestamp": "2025-07-29T22:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 23,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 433,
+      "timestamp": "2025-07-29T23:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 23,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 434,
+      "timestamp": "2025-07-29T23:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 23,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 435,
+      "timestamp": "2025-07-29T23:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 23,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 436,
+      "timestamp": "2025-07-29T23:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 0,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 437,
+      "timestamp": "2025-07-30T00:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 0,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 438,
+      "timestamp": "2025-07-30T00:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 0,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 439,
+      "timestamp": "2025-07-30T00:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 0,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 440,
+      "timestamp": "2025-07-30T00:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 1,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 441,
+      "timestamp": "2025-07-30T01:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 1,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 442,
+      "timestamp": "2025-07-30T01:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 1,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 443,
+      "timestamp": "2025-07-30T01:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 1,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 444,
+      "timestamp": "2025-07-30T01:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 2,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 445,
+      "timestamp": "2025-07-30T02:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 2,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 446,
+      "timestamp": "2025-07-30T02:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 2,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 447,
+      "timestamp": "2025-07-30T02:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 2,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 448,
+      "timestamp": "2025-07-30T02:55:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 5,
+      "hour_of_day": 3,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 449,
+      "timestamp": "2025-07-30T03:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 3,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 450,
+      "timestamp": "2025-07-30T03:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 3,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 451,
+      "timestamp": "2025-07-30T03:40:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 5,
+      "hour_of_day": 3,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 452,
+      "timestamp": "2025-07-30T03:55:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 5,
+      "hour_of_day": 4,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 453,
+      "timestamp": "2025-07-30T04:10:00",
+      "total_active_power": 93.67037200927734
+    },
+    {
+      "day": 5,
+      "hour_of_day": 4,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 454,
+      "timestamp": "2025-07-30T04:25:00",
+      "total_active_power": 93.67037200927734
+    },
+    {
+      "day": 5,
+      "hour_of_day": 4,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 455,
+      "timestamp": "2025-07-30T04:40:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 5,
+      "hour_of_day": 4,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 456,
+      "timestamp": "2025-07-30T04:55:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 5,
+      "hour_of_day": 5,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 457,
+      "timestamp": "2025-07-30T05:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 5,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 458,
+      "timestamp": "2025-07-30T05:25:00",
+      "total_active_power": 93.67037200927734
+    },
+    {
+      "day": 5,
+      "hour_of_day": 5,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 459,
+      "timestamp": "2025-07-30T05:40:00",
+      "total_active_power": 93.67037200927734
+    },
+    {
+      "day": 5,
+      "hour_of_day": 5,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 460,
+      "timestamp": "2025-07-30T05:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 6,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 461,
+      "timestamp": "2025-07-30T06:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 6,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 462,
+      "timestamp": "2025-07-30T06:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 6,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 463,
+      "timestamp": "2025-07-30T06:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 6,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 464,
+      "timestamp": "2025-07-30T06:55:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 5,
+      "hour_of_day": 7,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 465,
+      "timestamp": "2025-07-30T07:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 7,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 466,
+      "timestamp": "2025-07-30T07:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 7,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 467,
+      "timestamp": "2025-07-30T07:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 7,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 468,
+      "timestamp": "2025-07-30T07:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 8,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 469,
+      "timestamp": "2025-07-30T08:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 8,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 470,
+      "timestamp": "2025-07-30T08:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 8,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 471,
+      "timestamp": "2025-07-30T08:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 8,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 472,
+      "timestamp": "2025-07-30T08:55:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 5,
+      "hour_of_day": 9,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 473,
+      "timestamp": "2025-07-30T09:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 9,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 474,
+      "timestamp": "2025-07-30T09:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 9,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 475,
+      "timestamp": "2025-07-30T09:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 9,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 476,
+      "timestamp": "2025-07-30T09:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 10,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 477,
+      "timestamp": "2025-07-30T10:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 10,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 478,
+      "timestamp": "2025-07-30T10:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 10,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 479,
+      "timestamp": "2025-07-30T10:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 5,
+      "hour_of_day": 10,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 480,
+      "timestamp": "2025-07-30T10:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 11,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 481,
+      "timestamp": "2025-07-30T11:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 11,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 482,
+      "timestamp": "2025-07-30T11:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 11,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 483,
+      "timestamp": "2025-07-30T11:40:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 6,
+      "hour_of_day": 11,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 484,
+      "timestamp": "2025-07-30T11:55:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 6,
+      "hour_of_day": 12,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 485,
+      "timestamp": "2025-07-30T12:10:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 6,
+      "hour_of_day": 12,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 486,
+      "timestamp": "2025-07-30T12:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 12,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 487,
+      "timestamp": "2025-07-30T12:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 12,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 488,
+      "timestamp": "2025-07-30T12:55:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 6,
+      "hour_of_day": 13,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 489,
+      "timestamp": "2025-07-30T13:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 13,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 490,
+      "timestamp": "2025-07-30T13:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 13,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 491,
+      "timestamp": "2025-07-30T13:40:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 6,
+      "hour_of_day": 13,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 492,
+      "timestamp": "2025-07-30T13:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 14,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 493,
+      "timestamp": "2025-07-30T14:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 14,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 494,
+      "timestamp": "2025-07-30T14:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 14,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 495,
+      "timestamp": "2025-07-30T14:40:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 6,
+      "hour_of_day": 14,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 496,
+      "timestamp": "2025-07-30T14:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 15,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 497,
+      "timestamp": "2025-07-30T15:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 15,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 498,
+      "timestamp": "2025-07-30T15:25:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 6,
+      "hour_of_day": 15,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 499,
+      "timestamp": "2025-07-30T15:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 15,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 500,
+      "timestamp": "2025-07-30T15:55:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 6,
+      "hour_of_day": 16,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 501,
+      "timestamp": "2025-07-30T16:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 16,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 502,
+      "timestamp": "2025-07-30T16:25:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 6,
+      "hour_of_day": 16,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 503,
+      "timestamp": "2025-07-30T16:40:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 6,
+      "hour_of_day": 16,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 504,
+      "timestamp": "2025-07-30T16:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 17,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 505,
+      "timestamp": "2025-07-30T17:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 17,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 506,
+      "timestamp": "2025-07-30T17:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 17,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 507,
+      "timestamp": "2025-07-30T17:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 17,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 508,
+      "timestamp": "2025-07-30T17:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 18,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 509,
+      "timestamp": "2025-07-30T18:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 18,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 510,
+      "timestamp": "2025-07-30T18:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 18,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 511,
+      "timestamp": "2025-07-30T18:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 18,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 512,
+      "timestamp": "2025-07-30T18:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 19,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 513,
+      "timestamp": "2025-07-30T19:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 19,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 514,
+      "timestamp": "2025-07-30T19:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 19,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 515,
+      "timestamp": "2025-07-30T19:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 19,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 516,
+      "timestamp": "2025-07-30T19:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 20,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 517,
+      "timestamp": "2025-07-30T20:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 20,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 518,
+      "timestamp": "2025-07-30T20:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 20,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 519,
+      "timestamp": "2025-07-30T20:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 20,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 520,
+      "timestamp": "2025-07-30T20:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 21,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 521,
+      "timestamp": "2025-07-30T21:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 21,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 522,
+      "timestamp": "2025-07-30T21:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 21,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 523,
+      "timestamp": "2025-07-30T21:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 21,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 524,
+      "timestamp": "2025-07-30T21:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 22,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 525,
+      "timestamp": "2025-07-30T22:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 22,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 526,
+      "timestamp": "2025-07-30T22:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 22,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 527,
+      "timestamp": "2025-07-30T22:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 22,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 528,
+      "timestamp": "2025-07-30T22:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 23,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 529,
+      "timestamp": "2025-07-30T23:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 23,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 530,
+      "timestamp": "2025-07-30T23:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 23,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 531,
+      "timestamp": "2025-07-30T23:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 23,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 532,
+      "timestamp": "2025-07-30T23:55:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 6,
+      "hour_of_day": 0,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 533,
+      "timestamp": "2025-07-31T00:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 0,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 534,
+      "timestamp": "2025-07-31T00:25:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 6,
+      "hour_of_day": 0,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 535,
+      "timestamp": "2025-07-31T00:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 0,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 536,
+      "timestamp": "2025-07-31T00:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 1,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 537,
+      "timestamp": "2025-07-31T01:10:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 6,
+      "hour_of_day": 1,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 538,
+      "timestamp": "2025-07-31T01:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 1,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 539,
+      "timestamp": "2025-07-31T01:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 1,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 540,
+      "timestamp": "2025-07-31T01:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 2,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 541,
+      "timestamp": "2025-07-31T02:10:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 6,
+      "hour_of_day": 2,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 542,
+      "timestamp": "2025-07-31T02:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 2,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 543,
+      "timestamp": "2025-07-31T02:40:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 6,
+      "hour_of_day": 2,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 544,
+      "timestamp": "2025-07-31T02:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 3,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 545,
+      "timestamp": "2025-07-31T03:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 3,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 546,
+      "timestamp": "2025-07-31T03:25:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 6,
+      "hour_of_day": 3,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 547,
+      "timestamp": "2025-07-31T03:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 3,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 548,
+      "timestamp": "2025-07-31T03:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 4,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 549,
+      "timestamp": "2025-07-31T04:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 4,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 550,
+      "timestamp": "2025-07-31T04:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 4,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 551,
+      "timestamp": "2025-07-31T04:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 4,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 552,
+      "timestamp": "2025-07-31T04:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 5,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 553,
+      "timestamp": "2025-07-31T05:10:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 6,
+      "hour_of_day": 5,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 554,
+      "timestamp": "2025-07-31T05:25:00",
+      "total_active_power": 93.67037200927734
+    },
+    {
+      "day": 6,
+      "hour_of_day": 5,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 555,
+      "timestamp": "2025-07-31T05:40:00",
+      "total_active_power": 93.67037200927734
+    },
+    {
+      "day": 6,
+      "hour_of_day": 5,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 556,
+      "timestamp": "2025-07-31T05:55:00",
+      "total_active_power": 93.67037200927734
+    },
+    {
+      "day": 6,
+      "hour_of_day": 6,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 557,
+      "timestamp": "2025-07-31T06:10:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 6,
+      "hour_of_day": 6,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 558,
+      "timestamp": "2025-07-31T06:25:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 6,
+      "hour_of_day": 6,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 559,
+      "timestamp": "2025-07-31T06:40:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 6,
+      "hour_of_day": 6,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 560,
+      "timestamp": "2025-07-31T06:55:00",
+      "total_active_power": 93.67037200927734
+    },
+    {
+      "day": 6,
+      "hour_of_day": 7,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 561,
+      "timestamp": "2025-07-31T07:10:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 6,
+      "hour_of_day": 7,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 562,
+      "timestamp": "2025-07-31T07:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 7,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 563,
+      "timestamp": "2025-07-31T07:40:00",
+      "total_active_power": 93.67037200927734
+    },
+    {
+      "day": 6,
+      "hour_of_day": 7,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 564,
+      "timestamp": "2025-07-31T07:55:00",
+      "total_active_power": 93.67037200927734
+    },
+    {
+      "day": 6,
+      "hour_of_day": 8,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 565,
+      "timestamp": "2025-07-31T08:10:00",
+      "total_active_power": 93.67037200927734
+    },
+    {
+      "day": 6,
+      "hour_of_day": 8,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 566,
+      "timestamp": "2025-07-31T08:25:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 6,
+      "hour_of_day": 8,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 567,
+      "timestamp": "2025-07-31T08:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 8,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 568,
+      "timestamp": "2025-07-31T08:55:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 6,
+      "hour_of_day": 9,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 569,
+      "timestamp": "2025-07-31T09:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 9,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 570,
+      "timestamp": "2025-07-31T09:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 9,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 571,
+      "timestamp": "2025-07-31T09:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 9,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 572,
+      "timestamp": "2025-07-31T09:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 10,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 573,
+      "timestamp": "2025-07-31T10:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 10,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 574,
+      "timestamp": "2025-07-31T10:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 10,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 575,
+      "timestamp": "2025-07-31T10:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 6,
+      "hour_of_day": 10,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 576,
+      "timestamp": "2025-07-31T10:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 11,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 577,
+      "timestamp": "2025-07-31T11:10:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 11,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 578,
+      "timestamp": "2025-07-31T11:25:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 11,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 579,
+      "timestamp": "2025-07-31T11:40:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 11,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 580,
+      "timestamp": "2025-07-31T11:55:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 12,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 581,
+      "timestamp": "2025-07-31T12:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 12,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 582,
+      "timestamp": "2025-07-31T12:25:00",
+      "total_active_power": 93.67037200927734
+    },
+    {
+      "day": 7,
+      "hour_of_day": 12,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 583,
+      "timestamp": "2025-07-31T12:40:00",
+      "total_active_power": 93.67037200927734
+    },
+    {
+      "day": 7,
+      "hour_of_day": 12,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 584,
+      "timestamp": "2025-07-31T12:55:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 13,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 585,
+      "timestamp": "2025-07-31T13:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 13,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 586,
+      "timestamp": "2025-07-31T13:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 13,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 587,
+      "timestamp": "2025-07-31T13:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 13,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 588,
+      "timestamp": "2025-07-31T13:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 14,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 589,
+      "timestamp": "2025-07-31T14:10:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 14,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 590,
+      "timestamp": "2025-07-31T14:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 14,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 591,
+      "timestamp": "2025-07-31T14:40:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 14,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 592,
+      "timestamp": "2025-07-31T14:55:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 15,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 593,
+      "timestamp": "2025-07-31T15:10:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 15,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 594,
+      "timestamp": "2025-07-31T15:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 15,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 595,
+      "timestamp": "2025-07-31T15:40:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 15,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 596,
+      "timestamp": "2025-07-31T15:55:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 16,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 597,
+      "timestamp": "2025-07-31T16:10:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 16,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 598,
+      "timestamp": "2025-07-31T16:25:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 16,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 599,
+      "timestamp": "2025-07-31T16:40:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 16,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 600,
+      "timestamp": "2025-07-31T16:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 17,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 601,
+      "timestamp": "2025-07-31T17:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 17,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 602,
+      "timestamp": "2025-07-31T17:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 17,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 603,
+      "timestamp": "2025-07-31T17:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 17,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 604,
+      "timestamp": "2025-07-31T17:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 18,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 605,
+      "timestamp": "2025-07-31T18:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 18,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 606,
+      "timestamp": "2025-07-31T18:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 18,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 607,
+      "timestamp": "2025-07-31T18:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 18,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 608,
+      "timestamp": "2025-07-31T18:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 19,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 609,
+      "timestamp": "2025-07-31T19:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 19,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 610,
+      "timestamp": "2025-07-31T19:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 19,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 611,
+      "timestamp": "2025-07-31T19:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 19,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 612,
+      "timestamp": "2025-07-31T19:55:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 20,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 613,
+      "timestamp": "2025-07-31T20:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 20,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 614,
+      "timestamp": "2025-07-31T20:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 20,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 615,
+      "timestamp": "2025-07-31T20:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 20,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 616,
+      "timestamp": "2025-07-31T20:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 21,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 617,
+      "timestamp": "2025-07-31T21:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 21,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 618,
+      "timestamp": "2025-07-31T21:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 21,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 619,
+      "timestamp": "2025-07-31T21:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 21,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 620,
+      "timestamp": "2025-07-31T21:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 22,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 621,
+      "timestamp": "2025-07-31T22:10:00",
+      "total_active_power": 93.6703109741211
+    },
+    {
+      "day": 7,
+      "hour_of_day": 22,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 622,
+      "timestamp": "2025-07-31T22:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 22,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 623,
+      "timestamp": "2025-07-31T22:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 22,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 624,
+      "timestamp": "2025-07-31T22:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 23,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 625,
+      "timestamp": "2025-07-31T23:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 23,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 626,
+      "timestamp": "2025-07-31T23:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 23,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 627,
+      "timestamp": "2025-07-31T23:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 23,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 628,
+      "timestamp": "2025-07-31T23:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 0,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 629,
+      "timestamp": "2025-08-01T00:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 0,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 630,
+      "timestamp": "2025-08-01T00:25:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 0,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 631,
+      "timestamp": "2025-08-01T00:40:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 0,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 632,
+      "timestamp": "2025-08-01T00:55:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 1,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 633,
+      "timestamp": "2025-08-01T01:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 1,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17738342285156,
+      "step": 634,
+      "timestamp": "2025-08-01T01:25:00",
+      "total_active_power": 93.67037200927734
+    },
+    {
+      "day": 7,
+      "hour_of_day": 1,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 635,
+      "timestamp": "2025-08-01T01:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 1,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 636,
+      "timestamp": "2025-08-01T01:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 2,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 637,
+      "timestamp": "2025-08-01T02:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 2,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 638,
+      "timestamp": "2025-08-01T02:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 2,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 639,
+      "timestamp": "2025-08-01T02:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 2,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 640,
+      "timestamp": "2025-08-01T02:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 3,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 641,
+      "timestamp": "2025-08-01T03:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 3,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 642,
+      "timestamp": "2025-08-01T03:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 3,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 643,
+      "timestamp": "2025-08-01T03:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 3,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 644,
+      "timestamp": "2025-08-01T03:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 4,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 645,
+      "timestamp": "2025-08-01T04:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 4,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 646,
+      "timestamp": "2025-08-01T04:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 4,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 647,
+      "timestamp": "2025-08-01T04:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 4,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 648,
+      "timestamp": "2025-08-01T04:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 5,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 649,
+      "timestamp": "2025-08-01T05:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 5,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 650,
+      "timestamp": "2025-08-01T05:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 5,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 651,
+      "timestamp": "2025-08-01T05:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 5,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 652,
+      "timestamp": "2025-08-01T05:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 6,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 653,
+      "timestamp": "2025-08-01T06:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 6,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 654,
+      "timestamp": "2025-08-01T06:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 6,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 655,
+      "timestamp": "2025-08-01T06:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 6,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 656,
+      "timestamp": "2025-08-01T06:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 7,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 657,
+      "timestamp": "2025-08-01T07:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 7,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 658,
+      "timestamp": "2025-08-01T07:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 7,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17738342285156,
+      "step": 659,
+      "timestamp": "2025-08-01T07:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 7,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 660,
+      "timestamp": "2025-08-01T07:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 8,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17738342285156,
+      "step": 661,
+      "timestamp": "2025-08-01T08:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 8,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 662,
+      "timestamp": "2025-08-01T08:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 8,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 663,
+      "timestamp": "2025-08-01T08:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 8,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 664,
+      "timestamp": "2025-08-01T08:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 9,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 665,
+      "timestamp": "2025-08-01T09:10:00",
+      "total_active_power": 93.67035675048828
+    },
+    {
+      "day": 7,
+      "hour_of_day": 9,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 666,
+      "timestamp": "2025-08-01T09:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 9,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 667,
+      "timestamp": "2025-08-01T09:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 9,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17739868164062,
+      "step": 668,
+      "timestamp": "2025-08-01T09:55:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 10,
+      "minute_of_hour": 10,
+      "not_use_power": 115.17739868164062,
+      "step": 669,
+      "timestamp": "2025-08-01T10:10:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 10,
+      "minute_of_hour": 25,
+      "not_use_power": 115.17739868164062,
+      "step": 670,
+      "timestamp": "2025-08-01T10:25:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 10,
+      "minute_of_hour": 40,
+      "not_use_power": 115.17739868164062,
+      "step": 671,
+      "timestamp": "2025-08-01T10:40:00",
+      "total_active_power": 93.67034149169922
+    },
+    {
+      "day": 7,
+      "hour_of_day": 10,
+      "minute_of_hour": 55,
+      "not_use_power": 115.17738342285156,
+      "step": 672,
+      "timestamp": "2025-08-01T10:55:00",
+      "total_active_power": 93.67034149169922
+    }
+  ],
+  "station_id": "1716387625733984256",
+  "status": "success",
+  "total_points": 672
+}
